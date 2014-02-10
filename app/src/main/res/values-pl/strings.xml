@@ -1,0 +1,34 @@
+<resources>
+
+    <string name="action_settings">Ustawienia</string>
+    <string name="album">Album</string>
+    <string name="app_name">Notif</string>
+    <string name="dismiss">Usuń</string>
+    <string name="event">Wydarzenie</string>
+    <string name="get_started">Zaloguj się, by rozpocząć :)</string>
+    <string name="group">Grupa</string>
+    <string name="loggedas">Zalogowany jako:</string>
+    <string name="logout">Wyloguj</string>
+    <string name="page">Strona</string>
+    <string name="photo">Zdjęcie</string>
+    <string name="pref_header_general">Główne</string>
+    <string name="pref_header_notifications">Powiadomienia</string>
+    <string name="pref_ringtone_silent">Cichy</string>
+    <string name="pref_title_ringtone">Dzwonek powiadomienia</string>
+    <string name="pref_title_vibrate">Wibracje</string>
+    <string name="service_summary">Włącz/wyłącz usługę powiadamiania</string>
+    <string name="service_title">Usługa włączona/wyłączona</string>
+    <string name="settings">Wyloguj</string>
+    <string name="settingsActivity">Ustawienia</string>
+    <string name="stream">Post</string>
+    <string name="sync_mobile">Częstotliwość odświeżania sieć kom.</string>
+    <string name="sync_wifi">Częstotliwość odświeżania Wi-Fi</string>
+    <string name="title_activity_settings">Notif</string>
+    <string name="title_activity_splash_fragment">SplashFragment</string>
+    <string name="types_summary">Wybierz swoją wymarzoną opcję</string>
+    <string name="types_title">Typy powiadomienia</string>
+    <string name="about">O aplikacji</string>
+    <string name="pref_about">Inne</string>
+    <string name="version">Wersja</string>
+    <string name="author">Autor</string>
+</resources>

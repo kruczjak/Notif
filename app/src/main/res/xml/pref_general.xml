@@ -1,0 +1,77 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+        android:key="chat"
+        android:title="@string/chat"
+        android:summary="@string/chat_summary">
+        <CheckBoxPreference
+            android:title="@string/chat_service"
+            android:key="serviceChat"
+            android:defaultValue="true" />
+        <CheckBoxPreference
+            android:summary="@string/avatar_settings_summary"
+            android:title="@string/avatar_settings"
+            android:key="avatar_state"
+            android:dependency="serviceChat"
+            android:defaultValue="true" />
+        <CheckBoxPreference
+            android:key="avalibility_chat"
+            android:title="@string/avability"
+            android:summary="@string/avability_summary"
+            android:dependency="serviceChat"
+            android:defaultValue="true" />
+    </PreferenceScreen>
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="service"
+        android:title="@string/service_title"
+        android:summaryOff="@string/service_summary_off"
+        android:summaryOn="@string/service_summary_on" />
+
+    <ListPreference
+        android:defaultValue="120"
+        android:entries="@array/sync_titles"
+        android:entryValues="@array/sync_values"
+        android:key="mobileRATE"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        android:title="@string/sync_mobile"
+        android:dependency="service" />
+
+    <ListPreference
+        android:defaultValue="90"
+        android:entries="@array/sync_titles"
+        android:entryValues="@array/sync_values"
+        android:key="standardRATE"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        android:title="@string/sync_wifi"
+        android:dependency="service" />
+    <!-- NOTE: EditTextPreference accepts EditText attributes. -->
+    <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->
+    <!--<EditTextPreference
+        android:capitalize="words"
+        android:defaultValue="@string/pref_default_display_name"
+        android:inputType="textCapWords"
+        android:key="example_text"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/pref_title_display_name" /> -->
+
+    <!--
+         NOTE: Hide buttons to simplify the UI. Users can touch outside the dialog to
+         dismiss it.
+    -->
+    <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
+    <!--<ListPreference
+        android:defaultValue="-1"
+        android:entries="@array/pref_example_list_titles"
+        android:entryValues="@array/pref_example_list_values"
+        android:key="example_list"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        android:title="@string/pref_title_add_friends_to_messages" />-->
+
+
+</PreferenceScreen>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/fra">
+
+        <com.kruczjak.notif.Avatar
+            android:id="@+id/avatar"
+            android:layout_width="75px"
+            android:layout_height="75px"
+            android:src="@drawable/avatar100x100" />
+
+        <ImageView
+            android:id="@+id/online"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:src="@drawable/online"
+            android:visibility="visible" />
+
+    </FrameLayout>
+    /
+
+    <TextView
+        android:id="@+id/nameText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/background_light"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/fra"
+        android:paddingLeft="5dp"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+
+</RelativeLayout>

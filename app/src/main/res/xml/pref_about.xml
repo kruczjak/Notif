@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceScreen
+        android:title="@string/about"
+        android:persistent="false">
+        <EditTextPreference
+            android:selectable="false"
+            android:title="@string/version"
+            android:summary="@string/ver" />
+        <EditTextPreference
+            android:title="@string/author"
+            android:selectable="false"
+            android:summary="@string/author_name" />
+        <CheckBoxPreference
+            android:title="Debug"
+            android:defaultValue="false"
+            android:key="debug" />
+
+    </PreferenceScreen>
+
+</PreferenceScreen>
