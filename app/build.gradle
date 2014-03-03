@@ -15,11 +15,20 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
+
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven {
+        url "http://mente.github.io/facebook-api-android-aar"
+    }
 }
 
 dependencies {
-    compile project(':library:facebook')
     compile project(':library:smackSources')
     compile project(':library:actionbarsherlockPull')
+    compile 'com.facebook:facebook-android-sdk:+@aar'
     compile 'com.squareup.picasso:picasso:2.1.1@jar'
 }
