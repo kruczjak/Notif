@@ -141,8 +141,8 @@ public class ChatService extends Service {
         config.setSendPresence(preferences.getBoolean("avalibility_chat", true));
         config.setReconnectionAllowed(true);
 
-//        config.setDebuggerEnabled(true);
-//        XMPPConnection.DEBUG_ENABLED = true; // TODO delete debugger
+        config.setDebuggerEnabled(true);
+        XMPPConnection.DEBUG_ENABLED = true; // TODO delete debugger
 
         connectAsync(config);
     }
@@ -154,7 +154,7 @@ public class ChatService extends Service {
      */
     private void connectAsync(ConnectionConfiguration config) {
         xmpp = new XMPPConnection(config);
-//        XMPPConnection.DEBUG_ENABLED = true; // TODO delete debug
+        XMPPConnection.DEBUG_ENABLED = true; // TODO delete debug
         SASLAuthentication.registerSASLMechanism("X-FACEBOOK-PLATFORM", SASLXFacebookPlatformMechanism.class);
         SASLAuthentication.supportSASLMechanism("X-FACEBOOK-PLATFORM", 0);
 

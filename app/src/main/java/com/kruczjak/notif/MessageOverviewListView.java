@@ -2,8 +2,6 @@ package com.kruczjak.notif;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
@@ -42,20 +40,20 @@ public class MessageOverviewListView extends ListView implements OnScrollListene
 
     @Override
     public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-        if (getAdapter() == null)
-            return;
-        if (getAdapter().getCount() == 0)
-            return;
-
-        int l = visibleItemCount + firstVisibleItem;
-        if (l >= totalItemCount && !isLoading) {
-            Log.i("deb", "end");
-            LayoutInflater inflater = (LayoutInflater) super.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            footer = inflater.inflate(R.layout.loading_row, null);
-            this.addFooterView(footer);
-            isLoading = true;
-            listener.loadData();
-        }
+//        if (getAdapter() == null)
+//            return;
+//        if (getAdapter().getCount() == 0)
+//            return;
+//
+//        int l = visibleItemCount + firstVisibleItem;
+//        if (l >= totalItemCount && !isLoading) {
+//            Log.i("deb", "end");
+//            LayoutInflater inflater = (LayoutInflater) super.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//            footer = inflater.inflate(R.layout.loading_row, null);
+//            this.addFooterView(footer);
+//            isLoading = true;
+//            listener.loadData();
+//        }
     }
 
     /**

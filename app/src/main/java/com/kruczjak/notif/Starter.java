@@ -331,15 +331,7 @@ public class Starter extends SherlockFragmentActivity {
     public void onStart() {
         super.onStart();
 
-        Bundle bundle = getIntent().getBundleExtra("go");
 
-        if (bundle != null)
-            addMessageThreadFragment(bundle);
-/*Open notification tab, if needed*/
-        if (getIntent().getBooleanExtra("not", false)) {
-            ActionBar ab = getSupportActionBar();
-            ab.setSelectedNavigationItem(1);
-        }
     }
 
     private void addMessageThreadFragment(Bundle bundle) {
@@ -368,6 +360,22 @@ public class Starter extends SherlockFragmentActivity {
         stopNotService();
         if (messageOverviewCommunicator != null)
             messageOverviewCommunicator.refreshListView();
+
+        openFromNotification();
+    }
+
+    /**
+     * Open message thread or change tab onResume()
+     */
+    private void openFromNotification() {
+        Bundle bundle = getIntent().getBundleExtra("go");
+        if (bundle != null)
+            addMessageThreadFragment(bundle);
+/*Open notification tab, if needed*/
+        if (getIntent().getBooleanExtra("not", false)) {
+            ActionBar ab = getSupportActionBar();
+            ab.setSelectedNavigationItem(1);
+        }
     }
 
     private void registerMyReceiver() {
