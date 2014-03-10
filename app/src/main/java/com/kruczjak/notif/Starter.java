@@ -10,6 +10,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -24,6 +27,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Base64;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.View;
@@ -45,6 +49,8 @@ import com.facebook.SessionDefaultAudience;
 import com.facebook.SessionState;
 import com.facebook.UiLifecycleHelper;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -83,9 +89,7 @@ public class Starter extends SherlockFragmentActivity {
     private static final int FRAGMENT_GROUP = 0;
     ChatService mService;
     protected static final String TAG = "Starter";
-    private boolean isResumed = false;
     private boolean isServiceBind = false;
-    private UiLifecycleHelper uiHelper; // from facebookSDK classes
     private boolean service_start = true;
     private Menu menu;
     private ContactsAdapter cca;
@@ -100,9 +104,6 @@ public class Starter extends SherlockFragmentActivity {
         setContentView(R.layout.activity_starter);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         startChatService();
-/*facebook*/
-        uiHelper = new UiLifecycleHelper(this, callback); // start facebookSDK's															// work
-        uiHelper.onCreate(savedInstanceState);
 /*Tabs*/
         StarterViewPager vP = (StarterViewPager) findViewById(R.id.viewpager);
         new FragmentTabPagerControl(this, vP);
@@ -116,6 +117,16 @@ public class Starter extends SherlockFragmentActivity {
 /*DrawerLayout (Contacts)*/
         initDrawerLayout();
         stopNotService();
+/*Auth fragment*/
+        Session session = Session.getActiveSession();
+        if (session == null || !session.isOpened()) {
+            if (session==null)
+                Log.i(TAG, "Couse it's null");
+            ActionBar ab = getSupportActionBar();
+            ab.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+            showSplash();
+            Log.d(TAG, "onCreate() showSplash()");
+        }
     }
 
     private void startChatService() {
@@ -355,8 +366,6 @@ public class Starter extends SherlockFragmentActivity {
             doBindService();
         }
 
-        uiHelper.onResume();
-        isResumed = true;
         stopNotService();
         if (messageOverviewCommunicator != null)
             messageOverviewCommunicator.refreshListView();
@@ -393,32 +402,12 @@ public class Starter extends SherlockFragmentActivity {
         doUnbindService();
         unregisterMyReceiver();
 
-        uiHelper.onPause();
-        isResumed = false;
         Session session = Session.getActiveSession();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         if (session != null && service_start && !preferences.getBoolean("firstRun", true))
             startNotService();
 
         service_start = true;
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        uiHelper.onDestroy();
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        uiHelper.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        uiHelper.onActivityResult(requestCode, resultCode, data);
     }
 
     private void addSplashFragment() {
@@ -429,7 +418,7 @@ public class Starter extends SherlockFragmentActivity {
         transaction.commit();
     }
 
-    private void removeSplashFragment() {
+    public void removeSplashFragment() {
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
         transaction.remove(splash);
@@ -439,61 +428,62 @@ public class Starter extends SherlockFragmentActivity {
     @Override
     protected void onResumeFragments() {
         super.onResumeFragments();
-        Session session = Session.getActiveSession();
-
-        if (session != null && session.isOpened()) {
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-            if (!preferences.getBoolean("log", false)) {
-//				preferences.edit().putBoolean("log", true).commit();
-//              addFacebookPermission();
-            }
-        } else {
-            ActionBar ab = getSupportActionBar();
-            ab.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-            showSplash();
-            Log.d(TAG, "OnResumeFragments showSplash()");
-        }
+//        Session session = Session.getActiveSession();
+//
+//        if (session != null && session.isOpened()) {
+//            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+//            if (!preferences.getBoolean("log", false)) {
+////				preferences.edit().putBoolean("log", true).commit();
+////              addFacebookPermission();
+//                Log.i(TAG, "First go");
+//            }
+//        } else {
+//            ActionBar ab = getSupportActionBar();
+//            ab.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+//            showSplash();
+//            Log.d(TAG, "OnResumeFragments showSplash()");
+//        }
     }
 
     /**
      * Called when session is changed.
      *
-     * @param session
      * @param state
-     * @param exception
      */
-    private void onSessionStateChange(Session session, SessionState state, Exception exception) {
+    public void onSessionStateChange(SessionState state) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        // Only make changes if the activity is visible
-        if (isResumed) {
-            FragmentManager manager = getSupportFragmentManager();
-            // Get the number of entries in the back stack
-            int backStackSize = manager.getBackStackEntryCount();
-            // Clear the back stack
-            for (int i = 0; i < backStackSize; i++) {
-                manager.popBackStack();
-            }
+        Log.i(TAG, "onSession");
 
-            if (state.isOpened()) {
-                if (!preferences.getBoolean("log", false)) { // when called
-                    // first time
-                    // (after first
-                    // ok)
-                    preferences.edit().putBoolean("log", true).commit();
+        clearBackStack();
+        if (state.isOpened()) {
+            Log.i(TAG,"state is opened");
+            if (!preferences.getBoolean("log", false)) { // when called
+                // first time
+                // (after first
+                // ok)
+                preferences.edit().putBoolean("log", true).commit();
+                if (preferences.getBoolean("firstRun", true)) loggedInActions();
+//                addFacebookPermission(); // TODO ADD VIEW TO AUTHENTICATE
+                // AFTER THIS WAS CANCELLED
 
-                    addFacebookPermission(); // TODO ADD VIEW TO AUTHENTICATE
-                    // AFTER THIS WAS CANCELLED
+            } else { // when called second time, after 2 ok
 
-                } else { // when called second time, after 2 ok
-
-                    if (preferences.getBoolean("firstRun", true)) {
-                        loggedInActions();
-                    }
+                if (preferences.getBoolean("firstRun", true)) {
+                    //loggedInActions();
                 }
-
-            } else if (state.isClosed()) {
-                showSplash();
             }
+
+        } else if (state.isClosed()) {
+            Log.i(TAG, "state is closed");
+            showSplash();
+        }
+    }
+
+    private void clearBackStack() {
+        FragmentManager manager = getSupportFragmentManager();
+        int backStackSize = manager.getBackStackEntryCount();
+        for (int i = 0; i < backStackSize; i++) {
+            manager.popBackStack();
         }
     }
 
@@ -612,16 +602,6 @@ public class Starter extends SherlockFragmentActivity {
         // -_-
         Log.i(TAG, "Showed");
     }
-
-    /**
-     * Some kind of facebook shit. Something like listener.
-     */
-    private Session.StatusCallback callback = new Session.StatusCallback() {
-        @Override
-        public void call(Session session, SessionState state, Exception exception) {
-            onSessionStateChange(session, state, exception);
-        }
-    };
 
     /**
      * Create menu.
