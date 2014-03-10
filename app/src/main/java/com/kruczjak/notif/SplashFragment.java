@@ -14,7 +14,6 @@ import android.widget.Toast;
 
 import com.facebook.Session;
 import com.facebook.SessionDefaultAudience;
-import com.facebook.SessionLoginBehavior;
 import com.facebook.SessionState;
 import com.facebook.UiLifecycleHelper;
 import com.facebook.widget.LoginButton;
@@ -50,8 +49,6 @@ public class SplashFragment extends Fragment {
      * @param exception error
      */
     private void onSessionStateChange(Session session, SessionState state, Exception exception) {
-        //((Starter)getActivity()).onSessionStateChange(state);
-        ((Starter)getActivity()).enableMenu(false);
         if (state.isOpened()) {
             if (!isExtendedPermissionAdded(session)) {
                 setNewView(session);

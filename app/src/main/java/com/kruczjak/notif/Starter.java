@@ -10,9 +10,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -27,7 +24,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Base64;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.View;
@@ -44,13 +40,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.facebook.Session;
-import com.facebook.Session.NewPermissionsRequest;
-import com.facebook.SessionDefaultAudience;
-import com.facebook.SessionState;
-import com.facebook.UiLifecycleHelper;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -120,8 +110,6 @@ public class Starter extends SherlockFragmentActivity {
 /*Auth fragment*/
         Session session = Session.getActiveSession();
         if (session == null || !session.isOpened()) {
-            if (session==null)
-                Log.i(TAG, "Couse it's null");
             ActionBar ab = getSupportActionBar();
             ab.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
             showSplash();
@@ -341,8 +329,6 @@ public class Starter extends SherlockFragmentActivity {
     @Override
     public void onStart() {
         super.onStart();
-
-
     }
 
     private void addMessageThreadFragment(Bundle bundle) {
@@ -423,34 +409,6 @@ public class Starter extends SherlockFragmentActivity {
         FragmentTransaction transaction = fm.beginTransaction();
         transaction.remove(splash);
         transaction.commit();
-    }
-
-    @Override
-    protected void onResumeFragments() {
-        super.onResumeFragments();
-//        Session session = Session.getActiveSession();
-//
-//        if (session != null && session.isOpened()) {
-//            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-//            if (!preferences.getBoolean("log", false)) {
-////				preferences.edit().putBoolean("log", true).commit();
-////              addFacebookPermission();
-//                Log.i(TAG, "First go");
-//            }
-//        } else {
-//            ActionBar ab = getSupportActionBar();
-//            ab.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-//            showSplash();
-//            Log.d(TAG, "OnResumeFragments showSplash()");
-//        }
-    }
-
-    public void clearBackStack() {
-        FragmentManager manager = getSupportFragmentManager();
-        int backStackSize = manager.getBackStackEntryCount();
-        for (int i = 0; i < backStackSize; i++) {
-            manager.popBackStack();
-        }
     }
 
     /**
@@ -548,7 +506,6 @@ public class Starter extends SherlockFragmentActivity {
         addSplashFragment();
         if (notifCommunicator != null)
             notifCommunicator.stopHandler(); // TODO check if it's online first
-        // -_-
         Log.i(TAG, "Showed");
     }
 
