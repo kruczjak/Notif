@@ -445,41 +445,7 @@ public class Starter extends SherlockFragmentActivity {
 //        }
     }
 
-    /**
-     * Called when session is changed.
-     *
-     * @param state
-     */
-    public void onSessionStateChange(SessionState state) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        Log.i(TAG, "onSession");
-
-        clearBackStack();
-        if (state.isOpened()) {
-            Log.i(TAG,"state is opened");
-            if (!preferences.getBoolean("log", false)) { // when called
-                // first time
-                // (after first
-                // ok)
-                preferences.edit().putBoolean("log", true).commit();
-                if (preferences.getBoolean("firstRun", true)) loggedInActions();
-//                addFacebookPermission(); // TODO ADD VIEW TO AUTHENTICATE
-                // AFTER THIS WAS CANCELLED
-
-            } else { // when called second time, after 2 ok
-
-                if (preferences.getBoolean("firstRun", true)) {
-                    //loggedInActions();
-                }
-            }
-
-        } else if (state.isClosed()) {
-            Log.i(TAG, "state is closed");
-            showSplash();
-        }
-    }
-
-    private void clearBackStack() {
+    public void clearBackStack() {
         FragmentManager manager = getSupportFragmentManager();
         int backStackSize = manager.getBackStackEntryCount();
         for (int i = 0; i < backStackSize; i++) {
@@ -490,7 +456,7 @@ public class Starter extends SherlockFragmentActivity {
     /**
      * Starting loging actions
      */
-    private void loggedInActions() {
+    public void loggedInActions() {
         Log.i(TAG, "Do Login");
         ProgressDialog dialog = ProgressDialog.show(Starter.this, "",
                 "Loading. Please wait...", true);
@@ -564,23 +530,6 @@ public class Starter extends SherlockFragmentActivity {
             ActionBar ab = getSupportActionBar();
             ab.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         }
-    }
-
-    /**
-     * Fucking Async adding permissions -_- it's TODO, ok but add check
-     */
-    private void addFacebookPermission() {
-
-        NewPermissionsRequest newPermissionsRequest = new Session.NewPermissionsRequest(this, new String[]{"manage_notifications"})
-                .setDefaultAudience(SessionDefaultAudience.ONLY_ME);
-
-        Session session = Session.getActiveSession();
-        session.requestNewPublishPermissions(newPermissionsRequest); // callback
-        // is
-        // called
-        // after
-        // it!
-
     }
 
     /**
@@ -663,6 +612,7 @@ public class Starter extends SherlockFragmentActivity {
         ChatDB chatDB = new ChatDB(this);
         chatDB.deleteAndCreateDB();
         chatDB.close();
+        showSplash();
         return true;
         // TODO add delete of chat db
     }
@@ -672,7 +622,7 @@ public class Starter extends SherlockFragmentActivity {
      *
      * @param enable if true
      */
-    private void enableMenu(boolean enable) {
+    public void enableMenu(boolean enable) {
         if (menu != null) {
             MenuItem item2 = menu.findItem(R.id.logout);
             item2.setEnabled(enable);
