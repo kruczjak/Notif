@@ -79,7 +79,7 @@ public class SplashFragment extends Fragment {
 
     /**
      * This method sets a view with buttons for extended permissions
-     * @param session
+     * @param session active session
      */
     private void setNewView(final Session session) {
         ViewGroup container = (ViewGroup) getView();
@@ -97,8 +97,8 @@ public class SplashFragment extends Fragment {
     }
 
     /**
-     * Fucking Async adding permissions -_- it's TODO, ok but add check
-     * @param session
+     * Fucking Async adding permissions -_-
+     * @param session active session
      */
     private void addFacebookPermission(Session session) {
         Session.NewPermissionsRequest newPermissionsRequest = new Session.NewPermissionsRequest(this, new String[]{"manage_notifications"})
