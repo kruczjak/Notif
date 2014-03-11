@@ -19,17 +19,17 @@ public class MessageOverviewListView extends ListView implements OnScrollListene
 
     public MessageOverviewListView(Context context) {
         super(context);
-        setOnScrollListener(this);
+//        setOnScrollListener(this);
     }
 
     public MessageOverviewListView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        setOnScrollListener(this);
+//        setOnScrollListener(this);
     }
 
     public MessageOverviewListView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        setOnScrollListener(this);
+//        setOnScrollListener(this);
     }
 
     public static interface EndlessListener {
