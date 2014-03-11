@@ -191,7 +191,7 @@ public class Starter extends SherlockFragmentActivity {
     private ServiceConnection notConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            notService = ((NotService.LocalBinder) service).getService();
+            notService = ((NotService.LocalBinder) iBinder).getService();
             //TODO first BIG update
         }
 

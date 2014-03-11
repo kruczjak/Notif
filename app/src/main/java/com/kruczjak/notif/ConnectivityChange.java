@@ -17,25 +17,25 @@ public class ConnectivityChange extends BroadcastReceiver {
         if (preferences.getBoolean("log", false)) return;
 
         if (isInternetAccess(context)) {
-                Log.i("NET", "connected");
+            Log.i("NET", "connected");
             sendBroadcast(context, 3);
             if (!NotService.service_state && preferences.getBoolean("service", true)) {
                 Intent service = new Intent(context, NotService.class);
                 context.startService(service);
                 Log.i("SERVICE", "START");
-                }
+            }
 
-                if (!ChatService.service_state) {
-                    Log.i("SERVICECHAT", "START");
-                    Intent service = new Intent(context, ChatService.class);
-                    context.startService(service);
-                }
+            if (!ChatService.service_state) {
+                Log.i("SERVICECHAT", "START");
+                Intent service = new Intent(context, ChatService.class);
+                context.startService(service);
+            }
 
-            } else {
+        } else {
             Log.i("NET", "Not connected");
             shutdownAllServices(context);
             sendBroadcast(context, 4);
-            }
+        }
     }
 
     /**
