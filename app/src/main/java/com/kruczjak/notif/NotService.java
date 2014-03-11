@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -35,6 +36,7 @@ import java.util.TimerTask;
  */
 public class NotService extends Service {
 
+    private final IBinder mBinder = new LocalBinder();
     static boolean service_state;
     private Timer updatingTimer = new Timer();
     private static final String TAG = "NOTSERVICE";
@@ -47,7 +49,7 @@ public class NotService extends Service {
 
     @Override
     public IBinder onBind(Intent arg0) {
-        return null;
+        return mBinder;
     }
 
     @Override
@@ -121,7 +123,8 @@ public class NotService extends Service {
                     public void onCompleted(Response response) {
                         jsonArrayDecodeAndTestForNew(response);
                     }
-                });
+                }
+        );
 
     }
 
@@ -297,5 +300,11 @@ public class NotService extends Service {
         updatingTimer.cancel();
         service_state = false;
         wl.release();
+    }
+
+    public class LocalBinder extends Binder {
+        NotService getService() {
+            return NotService.this;
+        }
     }
 }

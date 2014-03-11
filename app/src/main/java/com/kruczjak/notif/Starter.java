@@ -80,12 +80,12 @@ public class Starter extends SherlockFragmentActivity {
 
     private static final int FRAGMENT_GROUP = 0;
     ChatService chatService;
+    NotService notService;
     protected static final String TAG = "Starter";
     private boolean isServiceBind = false;
     private Menu menu;
     private ContactsAdapter cca;
     private SplashFragment splash;
-    private final static String MY_APP_ID = "159414930918189";
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
 
@@ -94,7 +94,6 @@ public class Starter extends SherlockFragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_starter);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        startChatService();
 /*Tabs*/
         StarterViewPager vP = (StarterViewPager) findViewById(R.id.viewpager);
         new FragmentTabPagerControl(this, vP);
@@ -109,6 +108,8 @@ public class Starter extends SherlockFragmentActivity {
         initDrawerLayout();
 /*Auth fragment*/
         startFBAuth(savedInstanceState);
+/*Start services*/
+        startServices(preferences);
     }
 
     /**
@@ -135,13 +136,17 @@ public class Starter extends SherlockFragmentActivity {
         }
     }
 
-    private void startChatService() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        if (!ChatService.service_state && preferences.getBoolean("log", false))
-            if (isInternetAccess()) {
-                Intent service = new Intent(this, ChatService.class);
-                startService(service);
-            }
+    private void startServices(SharedPreferences preferences) {
+        if (!isInternetAccess() || !preferences.getBoolean("log", false)) return;
+
+        if (!ChatService.service_state) {
+            Intent service = new Intent(this, ChatService.class);
+            startService(service);
+        }
+        if (!NotService.service_state && preferences.getBoolean("service", true)) {
+            Intent service = new Intent(this, NotService.class);
+            startService(service);
+        }
     }
 
     /**
@@ -183,6 +188,19 @@ public class Starter extends SherlockFragmentActivity {
         }
     };
 
+    private ServiceConnection notConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            notService = ((NotService.LocalBinder) service).getService();
+            //TODO first BIG update
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+        }
+    };
+
+
     /**
      * Connects service to activity.
      */
@@ -190,6 +208,10 @@ public class Starter extends SherlockFragmentActivity {
         if (!isServiceBind) {
             isServiceBind = true;
             bindService(new Intent(Starter.this, ChatService.class), chatConnection, Context.BIND_AUTO_CREATE);
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+            if (preferences.getBoolean("service", true))
+                bindService(new Intent(Starter.this, NotService.class), notConnection, Context.BIND_AUTO_CREATE);
         }
     }
 
@@ -200,6 +222,10 @@ public class Starter extends SherlockFragmentActivity {
         if (isServiceBind) {
             isServiceBind = false;
             unbindService(chatConnection);
+
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+            if (preferences.getBoolean("service", true))
+                unbindService(notConnection);
         }
     }
 
@@ -380,9 +406,6 @@ public class Starter extends SherlockFragmentActivity {
 
         doUnbindService();
         unregisterMyReceiver();
-
-        Session session = Session.getActiveSession();
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
     }
 
     private void addSplashFragment() {
@@ -427,7 +450,8 @@ public class Starter extends SherlockFragmentActivity {
         if (isInternetAccess()) {
             Log.i(TAG, "Splash removing");
             removeSplashFragment();
-            startChatService();
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+            startServices(preferences);
             doBindService();
             enableMenu(true);
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
