@@ -138,7 +138,7 @@ public class ChatDB extends SQLiteOpenHelper {
     }
 
     public Cursor getOnlineContacts(List<String> online) {
-        if (online == null) return null;
+        if (online == null || online.size() == 0) return null;
         SQLiteDatabase db = this.getReadableDatabase();
         String selectQuery = "SELECT * FROM " + TABLE_CONTACTS + " WHERE " + KEY_FAV + " IS NULL AND (";
         for (int i = 0; i < online.size() - 1; i++) {

@@ -41,6 +41,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.facebook.Session;
 import com.facebook.SessionState;
+import com.squareup.picasso.LruCache;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -78,10 +79,9 @@ public class Starter extends SherlockFragmentActivity {
     public MessageThreadCommunicator messageThreadCommunicator;
 
     private static final int FRAGMENT_GROUP = 0;
-    ChatService mService;
+    ChatService chatService;
     protected static final String TAG = "Starter";
     private boolean isServiceBind = false;
-    private boolean service_start = true;
     private Menu menu;
     private ContactsAdapter cca;
     private SplashFragment splash;
@@ -173,14 +173,13 @@ public class Starter extends SherlockFragmentActivity {
         });
     }
 
-    private ServiceConnection mConnection = new ServiceConnection() {
+    private ServiceConnection chatConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
-            mService = ((ChatService.LocalBinder) service).getService();
-            mService.rosterFirstStart();
+            chatService = ((ChatService.LocalBinder) service).getService();
         }
 
         public void onServiceDisconnected(ComponentName className) {
-            mService = null;
+            chatService = null;
         }
     };
 
@@ -190,7 +189,7 @@ public class Starter extends SherlockFragmentActivity {
     private void doBindService() {
         if (!isServiceBind) {
             isServiceBind = true;
-            bindService(new Intent(Starter.this, ChatService.class), mConnection, Context.BIND_AUTO_CREATE);
+            bindService(new Intent(Starter.this, ChatService.class), chatConnection, Context.BIND_AUTO_CREATE);
         }
     }
 
@@ -200,7 +199,7 @@ public class Starter extends SherlockFragmentActivity {
     private void doUnbindService() {
         if (isServiceBind) {
             isServiceBind = false;
-            unbindService(mConnection);
+            unbindService(chatConnection);
         }
     }
 
@@ -519,8 +518,6 @@ public class Starter extends SherlockFragmentActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
         if (itemId == R.id.action_settings) {
-            this.service_start = false; // to don't start service when looking
-            // at settigsactivity
             return startSettingsActivity();
         } else if (itemId == R.id.logout) {
             return logOut();
@@ -556,9 +553,13 @@ public class Starter extends SherlockFragmentActivity {
         ChatDB chatDB = new ChatDB(this);
         chatDB.deleteAndCreateDB();
         chatDB.close();
+
+        LruCache lruCache = new LruCache(this);
+        lruCache.clear();
+
         showSplash();
         return true;
-        // TODO add delete of chat db
+        // TODO add delete of chat db and pictures
     }
 
     /**
@@ -600,7 +601,7 @@ public class Starter extends SherlockFragmentActivity {
             switch (intent.getIntExtra("t", -1)) {
                 case 0:
                     Log.i(TAG, "Broadcast 0 received");
-//                    mService.rosterFirstStart();
+//                    chatService.rosterFirstStart();
                     break;
                 case 1:
                     Log.i(TAG, "Broadcast 1 received");
@@ -662,8 +663,8 @@ public class Starter extends SherlockFragmentActivity {
      */
     public void startProcessQueue(int id, String text, String time) {
         Log.i(TAG, "Starting proccesing queue, Starter->ChatService");
-        if (mService != null)
-            mService.startProcessQueue();
+        if (chatService != null)
+            chatService.startProcessQueue();
         else {
             Log.w(TAG, "Service ChatService is not running!");
             ChatDB db = new ChatDB(this);
@@ -673,13 +674,13 @@ public class Starter extends SherlockFragmentActivity {
     }
 
     public void setChattingNow(String chattingNow) {
-        if (mService != null)
-            mService.setChattingNow(chattingNow);
+        if (chatService != null)
+            chatService.setChattingNow(chattingNow);
     }
 
     public List<String> getOnline() {
-        if (mService != null)
-            return mService.getOnline();
+        if (chatService != null)
+            return chatService.getOnline();
         else
             return null;
     }
@@ -707,6 +708,7 @@ public class Starter extends SherlockFragmentActivity {
         @Override
         public void call(Session session, SessionState sessionState, Exception e) {
             if (session == null || !session.isOpened()) {
+//                if (!splash.isAdded())
                 showSplash();
                 Log.e(TAG, "SHOULD NOT BE: onCreate() showSplash()");
             }

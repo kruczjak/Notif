@@ -59,7 +59,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="10dp"
         android:gravity="center_horizontal"
-        android:text="PRE-ALPHA v0.0.0.2"
+        android:text="PRE-ALPHA v0.0.0.3"
         android:textSize="20sp"
         android:textStyle="bold" />
 

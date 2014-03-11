@@ -70,8 +70,8 @@ public class NotifFragment extends SherlockFragment implements OnRefreshListener
             public void run() {
                 mPullToRefreshLayout.setRefreshing(true);
                 c.moveToFirst();
-                checkFacebookNotification(" AND updated_time>" + c.getString(1));
-                handler.postDelayed(this, fuck.check_rate(getActivity()) * 1000);
+//                checkFacebookNotification(" AND updated_time>" + c.getString(1));
+//                handler.postDelayed(this, fuck.check_rate(getActivity()) * 1000);
             }
 
         };
@@ -136,17 +136,10 @@ public class NotifFragment extends SherlockFragment implements OnRefreshListener
 
     @Override
     public void onRefreshStarted(View view) {
-        handler.removeCallbacks(runnable);
-        c.moveToFirst();
-        checkFacebookNotification(" AND updated_time>" + c.getString(1));
-        timerStart();
+
     }
 
     private void timerStart() {
-        if (isInternetAccess() && !handler_running) {
-            handler.postDelayed(runnable, fuck.check_rate(getActivity()) * 1000);
-            handler_running = true;
-        }
     }
 
     private boolean isInternetAccess() {
