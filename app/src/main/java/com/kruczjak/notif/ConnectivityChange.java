@@ -13,29 +13,16 @@ public class ConnectivityChange extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        if (preferences.getBoolean("log", false)) return;
 
-        if (preferences.getBoolean("log", false)) {
-            ConnectivityManager connectivityManager = (ConnectivityManager)
-                    context.getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo activeNetInfo = connectivityManager.getActiveNetworkInfo();
-
-            if (activeNetInfo != null && activeNetInfo.isConnectedOrConnecting()) {
+        if (isInternetAccess(context)) {
                 Log.i("NET", "connected");
-
-                if (preferences.getBoolean("service", true)) {
-                    Intent brad = new Intent("com.kruczjak.notif");
-                    brad.putExtra("t", 3);
-                    context.sendBroadcast(brad);
-
-                    if (!NotService.service_state) {
-                        Intent service = new Intent(context, NotService.class);
-                        context.startService(service);
-                        //TODO
-                        Log.i("SERVICE", "START");
-                    } else
-                        Log.i("SERVICE", "IS_RUNNING OR DISABLED");
+            sendBroadcast(context, 3);
+            if (!NotService.service_state && preferences.getBoolean("service", true)) {
+                Intent service = new Intent(context, NotService.class);
+                context.startService(service);
+                Log.i("SERVICE", "START");
                 }
 
                 if (!ChatService.service_state) {
@@ -45,17 +32,46 @@ public class ConnectivityChange extends BroadcastReceiver {
                 }
 
             } else {
-                Log.i("NET", "not connected");
-
-                Intent brad = new Intent("com.kruczjak.notif");
-                brad.putExtra("t", 4);
-                context.sendBroadcast(brad);
-
-                Intent service = new Intent(context, NotService.class);
-                context.stopService(service);
-                service = new Intent(context, ChatService.class);
-                context.stopService(service);
+            Log.i("NET", "Not connected");
+            shutdownAllServices(context);
+            sendBroadcast(context, 4);
             }
-        }
+    }
+
+    /**
+     * Checks for internet
+     *
+     * @param context
+     * @return
+     */
+    private boolean isInternetAccess(Context context) {
+        ConnectivityManager connectivityManager = (ConnectivityManager)
+                context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetInfo = connectivityManager.getActiveNetworkInfo();
+        return (activeNetInfo != null && activeNetInfo.isConnectedOrConnecting());
+    }
+
+    /**
+     * Stops all services.
+     *
+     * @param context
+     */
+    private void shutdownAllServices(Context context) {
+        Intent service = new Intent(context, NotService.class);
+        context.stopService(service);
+        service = new Intent(context, ChatService.class);
+        context.stopService(service);
+    }
+
+    /**
+     * Send broadcast to Starter.java
+     *
+     * @param context
+     * @param number
+     */
+    private void sendBroadcast(Context context, int number) {
+        Intent brad = new Intent("com.kruczjak.notif");
+        brad.putExtra("t", number);
+        context.sendBroadcast(brad);
     }
 }
