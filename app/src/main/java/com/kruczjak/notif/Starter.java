@@ -40,6 +40,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.facebook.Session;
+import com.facebook.SessionState;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -84,7 +85,7 @@ public class Starter extends SherlockFragmentActivity {
     private Menu menu;
     private ContactsAdapter cca;
     private SplashFragment splash;
-
+    private final static String MY_APP_ID = "159414930918189";
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
 
@@ -108,12 +109,25 @@ public class Starter extends SherlockFragmentActivity {
         initDrawerLayout();
         stopNotService();
 /*Auth fragment*/
+        startFBAuth(savedInstanceState);
+    }
+
+    private void startFBAuth(Bundle savedInstanceState) {
         Session session = Session.getActiveSession();
-        if (session == null || !session.isOpened()) {
-            ActionBar ab = getSupportActionBar();
-            ab.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-            showSplash();
-            Log.d(TAG, "onCreate() showSplash()");
+        if (session == null) {
+            Session.StatusCallback statusCallback = new SessionStatusCallback();
+            if (savedInstanceState != null) {
+                session = Session.restoreSession(this, null, statusCallback, savedInstanceState);
+            }
+            if (session == null) {
+                session = new Session(this);
+            }
+            Session.setActiveSession(session);
+            if (session.getState().equals(SessionState.CREATED_TOKEN_LOADED)) {
+                Log.i(TAG, "Token is available");
+                session.openForRead(new Session.OpenRequest(this).setCallback(statusCallback));
+            } else
+                showSplash();
         }
     }
 
@@ -716,5 +730,16 @@ public class Starter extends SherlockFragmentActivity {
             return messageOverviewCommunicator.onMyContextItemSelected(item);
         }
         return false;
+    }
+
+    private class SessionStatusCallback implements Session.StatusCallback {
+        @Override
+        public void call(Session session, SessionState sessionState, Exception e) {
+            if (session == null || !session.isOpened()) {
+                showSplash();
+                Log.e(TAG, "SHOULD NOT BE: onCreate() showSplash()");
+            }
+
+        }
     }
 }
