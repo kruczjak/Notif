@@ -141,8 +141,8 @@ public class ChatService extends Service {
         config.setSendPresence(preferences.getBoolean("avalibility_chat", true));
         config.setReconnectionAllowed(true);
 
-        config.setDebuggerEnabled(true);
-        XMPPConnection.DEBUG_ENABLED = true; // TODO delete debugger
+//        config.setDebuggerEnabled(true);
+//        XMPPConnection.DEBUG_ENABLED = true; // TODO delete debugger
 
         connectAsync(config);
     }
@@ -154,7 +154,7 @@ public class ChatService extends Service {
      */
     private void connectAsync(ConnectionConfiguration config) {
         xmpp = new XMPPConnection(config);
-        XMPPConnection.DEBUG_ENABLED = true; // TODO delete debug
+//        XMPPConnection.DEBUG_ENABLED = true; // TODO delete debug
         SASLAuthentication.registerSASLMechanism("X-FACEBOOK-PLATFORM", SASLXFacebookPlatformMechanism.class);
         SASLAuthentication.supportSASLMechanism("X-FACEBOOK-PLATFORM", 0);
 
@@ -380,11 +380,13 @@ public class ChatService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "Chat service starty");
 
-        SmackAndroid.init(this);
-        try {
-            chatConfigAndStart();
-        } catch (XMPPException e) {
-            e.printStackTrace();
+        if (xmpp == null || !xmpp.isConnected() || !xmpp.isAuthenticated()) { //TODO add cases!
+            SmackAndroid.init(this);
+            try {
+                chatConfigAndStart();
+            } catch (XMPPException e) {
+                e.printStackTrace();
+            }
         }
         checkForNotReaded();
 
@@ -438,68 +440,6 @@ public class ChatService extends Service {
         ChatService getService() {
             return ChatService.this;
         }
-    }
-
-    /**
-     * Update Roster, it should be faster in AsyncTask.
-     */
-    public void rosterFirstStart() {
-        final Context ctx = this;
-
-//        new AsyncTask<Void, Void, Void>() {
-//
-//            @Override
-//            protected Void doInBackground(Void... params) {
-//                if (xmpp != null) {
-//                    Roster roster = xmpp.getRoster();
-//                    Collection<RosterEntry> entries = roster.getEntries();
-//
-//                    try {
-//                        Thread.sleep(2000);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//
-//                    System.out.println(entries.size() + " buddy(ies):");
-//                    ChatDB db = new ChatDB(ctx);
-//
-//                    for (RosterEntry entry : entries) {
-//                        String user = entry.getUser().split("[@-]")[1];
-//                        String name = entry.getName();
-//
-//                        if (db.checkToAdd(user, name)) {
-//                            File avatar = new File(getFilesDir(), user);
-//                            if (avatar.exists()) continue;
-//                            VCard vCard = new VCard();
-//
-//                            try {
-//                                vCard.load(xmpp, entry.getUser());
-//                                byte[] avatarBytes = vCard.getAvatar();
-//                                if (avatarBytes == null) continue;
-//
-//                                FileOutputStream fos = new FileOutputStream(avatar.getPath());
-//                                fos.write(avatarBytes);
-//                                fos.close();
-//                                Log.i(TAG, "Successfully saved avatar");
-//                            } catch (XMPPException e) {
-//                                Log.e(TAG, "Error in vCard");
-//                            } catch (FileNotFoundException e) {
-//                                e.printStackTrace();
-//                            } catch (IOException e) {
-//                                e.printStackTrace();
-//                            }
-//
-//
-//                        }
-//                    }
-//                    db.close();
-//
-//                    sendTypeBroadcast(1);
-//                    sendTypeBroadcast(2);
-//                }
-//                return null;
-//            }
-//        }.execute();
     }
 
     /**
@@ -643,7 +583,10 @@ public class ChatService extends Service {
         }.execute();
     }
 
-
+    /**
+     * This is class with sleep(150)
+     * It prevents activating big number of refreshes
+     */
     private class Waiter extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPostExecute(Void aVoid) {
