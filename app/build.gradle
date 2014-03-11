@@ -21,14 +21,12 @@ android {
 repositories {
     mavenCentral()
     mavenLocal()
-    maven {
-        url "http://mente.github.io/facebook-api-android-aar"
-    }
+    maven { url 'http://mente.github.io/facebook-api-android-aar' }
 }
 
 dependencies {
-    compile project(':library:smackSources')
     compile 'com.github.chrisbanes.actionbarpulltorefresh:extra-abs:+'
     compile 'com.facebook:facebook-android-sdk:+@aar'
     compile 'com.squareup.picasso:picasso:2.1.1@jar'
+    compile project(':library:smackSources')
 }

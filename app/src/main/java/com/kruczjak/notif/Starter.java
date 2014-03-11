@@ -107,11 +107,15 @@ public class Starter extends SherlockFragmentActivity {
             doBindService();
 /*DrawerLayout (Contacts)*/
         initDrawerLayout();
-        stopNotService();
 /*Auth fragment*/
         startFBAuth(savedInstanceState);
     }
 
+    /**
+     * Check's if fb session is active TODO add this to handler or asyncTask
+     *
+     * @param savedInstanceState
+     */
     private void startFBAuth(Bundle savedInstanceState) {
         Session session = Session.getActiveSession();
         if (session == null) {
@@ -317,29 +321,6 @@ public class Starter extends SherlockFragmentActivity {
         });
     }
 
-    /**
-     * Stops service.
-     */
-    private void stopNotService() {
-        Intent service = new Intent(this, NotService.class);
-        stopService(service);
-        NotService.service_state = true;
-    }
-
-    /**
-     * Checks if service is running and turns it on, when not.
-     */
-    private void startNotService() {
-        NotService.service_state = false;
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-
-        if (preferences.getBoolean("service", true) && preferences.getBoolean("log", false))
-            if (isInternetAccess()) {
-                Intent service = new Intent(this, NotService.class);
-                startService(service);
-            }
-    }
-
     @Override
     public void onStart() {
         super.onStart();
@@ -366,7 +347,6 @@ public class Starter extends SherlockFragmentActivity {
             doBindService();
         }
 
-        stopNotService();
         if (messageOverviewCommunicator != null)
             messageOverviewCommunicator.refreshListView();
 
@@ -404,10 +384,6 @@ public class Starter extends SherlockFragmentActivity {
 
         Session session = Session.getActiveSession();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        if (session != null && service_start && !preferences.getBoolean("firstRun", true))
-            startNotService();
-
-        service_start = true;
     }
 
     private void addSplashFragment() {
@@ -452,7 +428,6 @@ public class Starter extends SherlockFragmentActivity {
         if (isInternetAccess()) {
             Log.i(TAG, "Splash removing");
             removeSplashFragment();
-            notifCommunicator.startHandler();
             startChatService();
             doBindService();
             enableMenu(true);
@@ -518,8 +493,6 @@ public class Starter extends SherlockFragmentActivity {
         ActionBar ab = getSupportActionBar();
         ab.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         addSplashFragment();
-        if (notifCommunicator != null)
-            notifCommunicator.stopHandler(); // TODO check if it's online first
         Log.i(TAG, "Showed");
     }
 
@@ -638,12 +611,10 @@ public class Starter extends SherlockFragmentActivity {
                     break;
                 case 3:
                     Log.i(TAG, "Broadcast 3 received");
-                    notifCommunicator.startHandler();
                     doBindService();
                     break;
                 case 4:
                     Log.i(TAG, "Broadcast 4 received");
-                    notifCommunicator.stopHandler();
                     doUnbindService();
                     break;
                 case 5:
