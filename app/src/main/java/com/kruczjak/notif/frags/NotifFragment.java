@@ -47,16 +47,11 @@ import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
  * @author Jakub
  */
 public class NotifFragment extends SherlockFragment implements OnRefreshListener, NotifCommunicator {
-    private static final String TAG = "NotifFragment";
     private ListView lv;
     private Cursor c;
     private DatabaseHandler db;
     private CursorNotifAdapter cA;
-    private Runnable runnable;
-    private Handler handler = new Handler();
-    private FunctionsMain fuck = new FunctionsMain();
     private PullToRefreshLayout mPullToRefreshLayout;
-    private boolean handler_running = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -68,21 +63,7 @@ public class NotifFragment extends SherlockFragment implements OnRefreshListener
         }
 
         initPullToRefresh(view);
-
-        runnable = new Runnable() {
-
-            @Override
-            public void run() {
-                mPullToRefreshLayout.setRefreshing(true);
-                c.moveToFirst();
-//                checkFacebookNotification(" AND updated_time>" + c.getString(1));
-//                handler.postDelayed(this, fuck.check_rate(getActivity()) * 1000);
-            }
-
-        };
-
         initListView();
-//        firstInitRequest();
         return view;
     }
 
@@ -252,18 +233,11 @@ public class NotifFragment extends SherlockFragment implements OnRefreshListener
 
     @Override
     public void stopHandler() {
-        Log.i(TAG, "Stopping handler");
-        Log.i(TAG, "called handlercancel");
-        if (handler_running) {
-            handler.removeCallbacks(runnable);
-            handler_running = false;
-        }
-        Log.i(TAG, "handlercancel done");
+
     }
 
     @Override
     public void startHandler() {
-        Log.i(TAG, "Starting handler and req");
-        firstInitRequest();
+
     }
 }
