@@ -93,7 +93,6 @@ public class FBFriends {
 
         ChatDB chatDB = ChatDB.getInstance(ctx);
         chatDB.addFirstTimeContacts(list);
-        chatDB.close();
 
     }
 
@@ -128,7 +127,6 @@ public class FBFriends {
                 if (photo != null) {
                     ChatDB chatDB = ChatDB.getInstance(avatar.getContext());
                     chatDB.updatePhoto(fbID, photo);
-                    chatDB.close();
 
                     avatar.setTested(true);
                     avatar.setTesting(false);

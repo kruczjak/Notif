@@ -444,7 +444,6 @@ public class Starter extends SherlockFragmentActivity {
 
         ChatDB chatDB = ChatDB.getInstance(this);
         chatDB.deleteAndCreateDB();
-        chatDB.close();
 
         LruCache lruCache = new LruCache(this);
         lruCache.clear();
@@ -586,7 +585,6 @@ public class Starter extends SherlockFragmentActivity {
 
             ChatDB db = ChatDB.getInstance(this);
             db.addOrDeleteFav(id);
-            db.close();
             drawer.update();
             Toast.makeText(this, "Friend added or deleted", Toast.LENGTH_SHORT).show();
             return true;
@@ -610,5 +608,11 @@ public class Starter extends SherlockFragmentActivity {
 
     public Drawer getDrawer() {
         return drawer;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ChatDB.getInstance(this).close();
     }
 }

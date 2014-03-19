@@ -123,7 +123,6 @@ public class ChatService extends Service {
         }
 
         c.close();
-        db.close();
     }
 
     private void chatConfigAndStart() throws XMPPException {
@@ -222,7 +221,6 @@ public class ChatService extends Service {
             Date date = new Date();
             int time = (int) (date.getTime() / 1000);
             Bundle _idAndName = db.MessageAdder(user, message.getBody(), time);
-            db.close();
 
             if (!user.equals(chattingNow))
                 downloadPhotoAndShowNotification(_idAndName, message.getBody());
@@ -408,6 +406,7 @@ public class ChatService extends Service {
     @Override
     public void onDestroy() {
         updatingTimer.cancel();
+        ChatDB.getInstance(getApplicationContext()).close();
 
         xmppDisconnect();// works only when connection is still on
         if (config != null)
@@ -576,8 +575,6 @@ public class ChatService extends Service {
                     i--;
                     c.moveToNext();
                 }
-
-                db.close();
             }
 
         }.execute();

@@ -38,7 +38,6 @@ import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 public class MessageOverviewFragment extends SherlockFragment implements OnRefreshListener, MessageOverviewCommunicator, MessageOverviewListView.EndlessListener {
 
     private static final String TAG = "MessageOverviewFragment";
-    private ChatDB Chdb;
     private MessageOverviewAdapter mOA;
     MessageOverviewListView lv;
     public static final int FRAGMENT_GROUP = 1;
@@ -50,11 +49,10 @@ public class MessageOverviewFragment extends SherlockFragment implements OnRefre
         View view = inflater.inflate(R.layout.message_overview, container, false);
         lv = (MessageOverviewListView) view.findViewById(R.id.listView1);
 
-        Chdb = ChatDB.getInstance(getActivity());
+        ChatDB Chdb = ChatDB.getInstance(getActivity());
         List<String> online = ((Starter) getActivity()).getOnline();
         mOA = new MessageOverviewAdapter(getActivity(), Chdb.getAllLastFriends(), false, online);
         lv.setAdapter(mOA);
-        Chdb.close();
 
         lv.setOnItemClickListener(new OnItemClickListener() {
 
@@ -93,7 +91,6 @@ public class MessageOverviewFragment extends SherlockFragment implements OnRefre
 
                 ChatDB db = ChatDB.getInstance(getActivity());
                 boolean is = db.isFav(c.getString(0));
-                db.close();
 
                 if (is)
                     menu.add(FRAGMENT_GROUP, 0, 0, menuItems[0]);
@@ -113,11 +110,9 @@ public class MessageOverviewFragment extends SherlockFragment implements OnRefre
     @Override
     public void refreshListView() {
         Log.i(TAG, "GOT IT!");
-        Chdb = ChatDB.getInstance(getActivity());
-        ;
+        ChatDB Chdb = ChatDB.getInstance(getActivity());
         List<String> online = ((Starter) getActivity()).getOnline();
         mOA.changeCursor(Chdb.getAllLastFriends(), online);
-        Chdb.close();
     }
 
     @Override
@@ -136,9 +131,7 @@ public class MessageOverviewFragment extends SherlockFragment implements OnRefre
         String id = c.getString(0);
 
         ChatDB db = ChatDB.getInstance(getActivity());
-        ;
         db.addOrDeleteFav(id);
-        db.close();
         ((Starter) getActivity()).getDrawer().update();
         Toast.makeText(getActivity(), "Friend added or deleted", Toast.LENGTH_SHORT).show();
         return true;

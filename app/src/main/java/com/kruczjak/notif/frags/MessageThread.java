@@ -62,7 +62,6 @@ public class MessageThread extends SherlockFragment implements MessageThreadComm
         ChatDB db = ChatDB.getInstance(getActivity());
         mA = new MessagesAdapter(getActivity(), db.getMessages(Integer.toString(args.getInt("id"))), false);
         lv.setAdapter(mA);
-        db.close();
 
         send.setOnClickListener(new OnClickListener() {
             // send a message
@@ -107,7 +106,6 @@ public class MessageThread extends SherlockFragment implements MessageThreadComm
             db.addMessageOnThread(messageTextString, Integer.toString(args.getInt("id")), 0, 1, timeInt);
             //now save to queue
             db.addMessageToQueue(args.getInt("id"), args.getString("fbid"), messageTextString, time);
-            db.close();
             //now fire the queue
             ((Starter) getActivity()).startProcessQueue(args.getInt("id"), messageTextString, Long.toString(time));
         }
@@ -145,7 +143,6 @@ public class MessageThread extends SherlockFragment implements MessageThreadComm
             if (c.moveToLast())
                 db.updateAfterChat(args.getInt("id"), c.getString(1), c.getInt(3), c.getInt(4));
         }
-        db.close();
         ((Starter) getActivity()).messageOverviewCommunicator.refreshListView();
     }
 
@@ -189,7 +186,6 @@ public class MessageThread extends SherlockFragment implements MessageThreadComm
     public void refresh() {
         ChatDB db = ChatDB.getInstance(getActivity());
         mA.changeCursor(db.getMessages(Integer.toString(args.getInt("id"))));
-        db.close();
         scrollMyListViewToBottom();
     }
 }

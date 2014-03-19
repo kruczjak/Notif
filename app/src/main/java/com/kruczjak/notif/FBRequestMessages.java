@@ -205,7 +205,6 @@ public class FBRequestMessages {
 
                 }
             }
-            db.close();
         }
     }
 
@@ -215,7 +214,6 @@ public class FBRequestMessages {
     public void startAppRun() {
         ChatDB db = ChatDB.getInstance(ctx);
         int lastTime = db.getLastUpdated();
-        db.close();
 
         String fields = "inbox.since(" + Integer.toString(lastTime) + ").limit(99)";
 
