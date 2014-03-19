@@ -38,6 +38,7 @@
     <string-array name="menu">
         <item>Remove from favourites</item>
         <item>Add to favourites</item>
+        <item>Set onScreen notification</item>
     </string-array>
 
 </resources>

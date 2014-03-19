@@ -44,11 +44,30 @@ public class ScreenNotification {
             this.photoLink = data.getString("photo");
             setAndShowAvatar(data);
         } else {
-            number.setText(Integer.toString(data.getInt("nr")));
-            if (this.photoLink.equals(photoLink)) return;
-            avatar.showAvatar(photoLink, data.getString("fbid"), 3);
-            windowManager.updateViewLayout(view, params);
+            update(data);
+
         }
+    }
+
+    private void update(Bundle data) {
+        setFromData(data);
+        if (this.photoLink.equals(data.getString("photo"))) return;
+        avatar.showAvatar(photoLink, data.getString("fbid"), 3);
+        windowManager.updateViewLayout(view, params);
+    }
+
+    private void setFromData(Bundle data) {
+        if (data.getInt("nr") == 0)
+            number.setVisibility(View.GONE);
+        else {
+            number.setText(Integer.toString(data.getInt("nr")));
+            number.setVisibility(View.VISIBLE);
+        }
+
+        if (data.getBoolean("presence"))
+            online.setVisibility(View.VISIBLE);
+        else
+            online.setVisibility(View.INVISIBLE);
     }
 
 
@@ -72,8 +91,7 @@ public class ScreenNotification {
         online = (ImageView) view.findViewById(R.id.online);
 
         avatar.showAvatar(photoLink, data.getString("fbid"), 3);
-        number.setText(Integer.toString(data.getInt("nr")));
-
+        setFromData(data);
 
         params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -88,5 +106,26 @@ public class ScreenNotification {
 
         windowManager.addView(view, params);
         view.setOnTouchListener(new NotificationDragActions(windowManager, params, ctx));
+    }
+
+    public void changePresence(boolean present) {
+        if (present)
+            online.setVisibility(View.VISIBLE);
+        else
+            online.setVisibility(View.INVISIBLE);
+    }
+
+    public void fullMessages() {
+        WindowManager.LayoutParams fullParams = new WindowManager.LayoutParams(
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.TYPE_SYSTEM_ALERT,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+                PixelFormat.TRANSLUCENT);
+
+        LayoutInflater inflater = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        view = inflater.inflate(R.layout.chat_thread, null);
+
+        windowManager.addView(view, params);
     }
 }

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Toast;
 
 import static java.lang.Math.abs;
 
@@ -52,7 +51,7 @@ public class NotificationDragActions implements View.OnTouchListener {
 
     private void checkTouch() {
         if (abs(params.x - oX) < 10 && abs(params.y - oY) < 10) {
-            Toast.makeText(ctx, "clicked :D", Toast.LENGTH_LONG).show();
+            ScreenNotification.getInstance(ctx).fullMessages();
         }
     }
 }

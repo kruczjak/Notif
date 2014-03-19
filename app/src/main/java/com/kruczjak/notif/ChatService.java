@@ -73,10 +73,11 @@ public class ChatService extends Service {
     private PowerManager.WakeLock wl;
     private Timer updatingTimer = new Timer();
     private Chat chatThread;
-    AndroidConnectionConfiguration config;
-    String chattingNow = "";
+    private AndroidConnectionConfiguration config;
+    private String chattingNow = "";
     private List<String> online;
     private Waiter waiter;
+    private String notificationShowedNow;
 
     public List<String> getOnline() {
         return online;
@@ -195,10 +196,16 @@ public class ChatService extends Service {
 
             @Override
             public void presenceChanged(Presence presence) {
-                if (presence.isAvailable())
-                    online.add(presence.getFrom().split("[@-]")[1]);
+                String fbID = presence.getFrom().split("[@-]")[1];
+                boolean present = presence.isAvailable();
+                if (present)
+                    online.add(fbID);
                 else
-                    online.remove(presence.getFrom().split("[@-]")[1]);
+                    online.remove(fbID);
+
+                if (notificationShowedNow.equals(notificationShowedNow))
+                    ScreenNotification.getInstance(getApplicationContext()).changePresence(present);
+
 
                 if (waiter == null || waiter.getStatus() != AsyncTask.Status.RUNNING) {
                     waiter = new Waiter();
@@ -324,11 +331,24 @@ public class ChatService extends Service {
 
         sendTypeBroadcast(2);
 
+        startOnScreenNotification(data, preferences);
+    }
+
+    public void startOnScreenNotification(Bundle data) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        startOnScreenNotification(data, preferences);
+    }
+
+    private void startOnScreenNotification(Bundle data, SharedPreferences preferences) {
         if (preferences.getBoolean("onScreen", false)) {
-            ScreenNotification screenNotification = ScreenNotification.getInstance(getApplicationContext());
-            screenNotification.startNotification(data);
+            if (online != null && online.contains(data.getString("fbid")))
+                data.putBoolean("presence", true);
+            else
+                data.putBoolean("presence", false);
+            ScreenNotification.getInstance(getApplicationContext()).startNotification(data);
         }
     }
+
 
     private class ConnectionEstablishing extends AsyncTask<Void, Void, Void> {
 

@@ -97,6 +97,7 @@ public class MessageOverviewFragment extends SherlockFragment implements OnRefre
                     menu.add(FRAGMENT_GROUP, 0, 0, menuItems[0]);
                 else
                     menu.add(FRAGMENT_GROUP, 0, 0, menuItems[1]);
+                menu.add(FRAGMENT_GROUP, 1, 1, menuItems[2]);
             }
         });
         lv.listener = this;
@@ -125,11 +126,20 @@ public class MessageOverviewFragment extends SherlockFragment implements OnRefre
     public boolean onMyContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         int menuItemIndex = item.getItemId();
+
         Log.d(TAG, "Selected " + Integer.toString(menuItemIndex));
 
         Cursor c = mOA.getCursor();
         c.moveToPosition(info.position);
         String id = c.getString(0);
+
+        if (menuItemIndex == 1) {
+            Bundle data = new Bundle();
+            data.putBoolean("presence", false);
+            data.putString("fbid", c.getString(1));
+            data.putString("photo", c.getString(7));
+            ((Starter) getActivity()).startNotification(data);
+        }
 
         ChatDB db = ChatDB.getInstance(getActivity());
         db.addOrDeleteFav(id);

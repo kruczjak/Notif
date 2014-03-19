@@ -611,6 +611,13 @@ public class Starter extends SherlockFragmentActivity {
         return drawer;
     }
 
+
+    public void startNotification(Bundle data) {
+        if (chatService != null)
+            chatService.startOnScreenNotification(data);
+
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
