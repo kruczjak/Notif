@@ -1,7 +1,6 @@
 package com.kruczjak.notif;
 
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -11,27 +10,15 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.View;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -53,8 +40,6 @@ import java.util.concurrent.ExecutionException;
  */
 
 public class Starter extends SherlockFragmentActivity {
-
-    private boolean closingAfterChoose = false;
 
     public interface MessageOverviewCommunicator {
         public void refreshListView();
@@ -78,7 +63,7 @@ public class Starter extends SherlockFragmentActivity {
     public NotifCommunicator notifCommunicator;
     public MessageThreadCommunicator messageThreadCommunicator;
 
-    private static final int FRAGMENT_GROUP = 0;
+    public static final int FRAGMENT_GROUP = 0;
     ChatService chatService;
     NotService notService;
     protected static final String TAG = "Starter";
@@ -86,8 +71,7 @@ public class Starter extends SherlockFragmentActivity {
     private Menu menu;
     private ContactsAdapter cca;
     private SplashFragment splash;
-    private DrawerLayout mDrawerLayout;
-    private ListView mDrawerList;
+    private Drawer drawer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,7 +86,7 @@ public class Starter extends SherlockFragmentActivity {
 /*ActionBar*/
         navigationMode();
 /*Binding Service*/
-        if (preferences.getBoolean("log", false) && isInternetAccess())
+        if (preferences.getBoolean("log", false) && FunctionsMain.isInternetAccess(this))
             doBindService();
 /*DrawerLayout (Contacts)*/
         initDrawerLayout();
@@ -137,7 +121,7 @@ public class Starter extends SherlockFragmentActivity {
     }
 
     private void startServices(SharedPreferences preferences) {
-        if (!isInternetAccess() || !preferences.getBoolean("log", false)) return;
+        if (!FunctionsMain.isInternetAccess(this) || !preferences.getBoolean("log", false)) return;
 
         if (!ChatService.service_state) {
             Intent service = new Intent(this, ChatService.class);
@@ -149,34 +133,17 @@ public class Starter extends SherlockFragmentActivity {
         }
     }
 
-    /**
-     * Checks if Internet is available.
-     *
-     * @return true if connected, false if disconnected
-     */
-    public boolean isInternetAccess() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetInfo = connectivityManager.getActiveNetworkInfo();
-        return (activeNetInfo != null && activeNetInfo.isConnectedOrConnecting());
-    }
+//    /**
+//     * Checks if Internet is available.
+//     *
+//     * @return true if connected, false if disconnected
+//     */
+//    public boolean isInternetAccess() {
+//        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+//        NetworkInfo activeNetInfo = connectivityManager.getActiveNetworkInfo();
+//        return (activeNetInfo != null && activeNetInfo.isConnectedOrConnecting());
+//    }
 
-    /**
-     * Update left friends list ASYNC.
-     */
-    public void updateMDrawerLayout() {
-        Log.i(TAG, "drawerUpdateAfterRoster");
-        new Handler().post(new Runnable() { // thread for loading data from db
-            @Override
-            public void run() {
-                ChatDB dbcha = new ChatDB(getApplicationContext());
-                cca.setFavourites(dbcha.getFav());
-                cca.setOnline(getOnline());
-                cca.setRest(dbcha.getOnlineContacts(getOnline()));
-                cca.notifyDataSetChanged();
-                dbcha.close();
-            }
-        });
-    }
 
     private ServiceConnection chatConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
@@ -238,112 +205,9 @@ public class Starter extends SherlockFragmentActivity {
      * it's better).
      */
     private void initDrawerLayout() {
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerList = (ListView) findViewById(R.id.left_drawer);
-
-        final CharSequence mDrawerTitle = "Friends"; //TODO strings
-        final CharSequence mTitle = getTitle();
-
-        ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.drawable.icon, R.string.friends, R.string.friends) {
-            /** Called when a drawer has settled in a completely closed state. */
-            public void onDrawerClosed(View view) {
-                if (closingAfterChoose)
-                    closingAfterChoose = false;
-                else
-                    getSupportActionBar().setTitle(mTitle);
-            }
-
-            /** Called when a drawer has settled in a completely open state. */
-            public void onDrawerOpened(View drawerView) {
-                getSupportActionBar().setTitle(mDrawerTitle);
-            }
-        };
-
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
-        final Activity activity = this;
-        new Handler().post(new Runnable() { // thread for loading data from db
-            @Override
-            public void run() {
-                ChatDB dbcha = new ChatDB(getApplicationContext());
-                cca = new ContactsAdapter(activity, dbcha.getFav(), dbcha.getOnlineContacts(getOnline()), getOnline());
-                mDrawerList.setAdapter(cca);
-                dbcha.close();
-            }
-        });
-
-        mDrawerList.setOnItemClickListener(new OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View v, int position, long arg3) {
-                LinearLayout sc = (LinearLayout) findViewById(R.id.left_drawer_layout);
-                closingAfterChoose = true;
-                mDrawerLayout.closeDrawer(sc);
-                Bundle args = cca.getData(position);
-
-                if (args.getBoolean("notable")) {
-                    ChatDB db = new ChatDB(getApplicationContext());
-                    db.createMessageTable(String.valueOf(args.getInt("id")));
-                    db.close();
-                }
-                addMessageThreadFragment(args);
-            }
-
-        });
-
-        mDrawerList.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
-            @Override
-            public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-                AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-                Bundle args = cca.getData(info.position);
-                menu.setHeaderTitle(args.getString("name"));
-                String[] menuItems = getResources().getStringArray(R.array.menu);
-
-                ChatDB db = new ChatDB(getApplicationContext());
-                boolean is = db.isFav(String.valueOf(args.getInt("id")));
-                db.close();
-
-                if (is)
-                    menu.add(FRAGMENT_GROUP, 0, 0, menuItems[0]);
-                else
-                    menu.add(FRAGMENT_GROUP, 0, 0, menuItems[1]);
-            }
-        });
-
-        EditText editText = (EditText) findViewById(R.id.finder);
-        editText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-                if (charSequence.toString().equals("")) {
-                    ChatDB dbcha = new ChatDB(getApplicationContext());
-                    cca = new ContactsAdapter(activity, dbcha.getFav(), dbcha.getOnlineContacts(getOnline()), getOnline());
-                    mDrawerList.setAdapter(cca);
-                    dbcha.close();
-                } else {
-                    String search = charSequence.toString();
-                    if (mDrawerList.getAdapter() == cca) {
-                        ChatDB chatDB = new ChatDB(getApplicationContext());
-                        ContactsSearchAdapter searchAdapter = new ContactsSearchAdapter(activity, chatDB.getSearched(search, getOnline()), getOnline());
-                        mDrawerList.setAdapter(searchAdapter);
-                        chatDB.close();
-                    } else {
-                        ChatDB chatDB = new ChatDB(getApplicationContext());
-                        ContactsSearchAdapter searchAdapter = (ContactsSearchAdapter) mDrawerList.getAdapter();
-                        searchAdapter.changeCursor(chatDB.getSearched(search, getOnline()));
-
-                    }
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
+        drawer = (Drawer) findViewById(R.id.drawer_layout);
+        drawer.setStarterContext(this);
+        drawer.init();
     }
 
     @Override
@@ -351,7 +215,7 @@ public class Starter extends SherlockFragmentActivity {
         super.onStart();
     }
 
-    private void addMessageThreadFragment(Bundle bundle) {
+    public void addMessageThreadFragment(Bundle bundle) {
         MessageThread fragment = new MessageThread();
         fragment.setArguments(bundle);
         FragmentManager fm = getSupportFragmentManager();
@@ -368,7 +232,7 @@ public class Starter extends SherlockFragmentActivity {
         registerMyReceiver();
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        if (prefs.getBoolean("log", false) && isInternetAccess() && !prefs.getBoolean("first", true)) {
+        if (prefs.getBoolean("log", false) && FunctionsMain.isInternetAccess(this) && !prefs.getBoolean("first", true)) {
             doBindService();
         }
 
@@ -447,14 +311,14 @@ public class Starter extends SherlockFragmentActivity {
      * @param dialog dialog to disable
      */
     public void loggedInActions2(final ProgressDialog dialog) {
-        if (isInternetAccess()) {
+        if (FunctionsMain.isInternetAccess(this)) {
             Log.i(TAG, "Splash removing");
             removeSplashFragment();
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
             startServices(preferences);
             doBindService();
             enableMenu(true);
-            mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+            drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
             navigationMode();
             Log.i(TAG, "LOGIN:2nd gone");
         } else {
@@ -465,7 +329,7 @@ public class Starter extends SherlockFragmentActivity {
             return;
         }
 
-        updateMDrawerLayout();
+        drawer.update();
         messageOverviewCommunicator.refreshListView();
 
         new AsyncTask<Void, Void, Void>() {
@@ -506,6 +370,7 @@ public class Starter extends SherlockFragmentActivity {
      * Show Splash screen and do some damage! xD (cancel handler runnable)
      */
     public void showSplash() {
+        chatService.onDestroy();
         doUnbindService();
         Intent service = new Intent(this, ChatService.class);
         stopService(service);
@@ -602,16 +467,16 @@ public class Starter extends SherlockFragmentActivity {
      * Lock drawer in close position.
      */
     public void lockCloseDrawer() {
-        if (mDrawerLayout != null)
-            mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+        if (drawer != null)
+            drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
     }
 
     /**
      * Unlock drawer.
      */
     public void unlockDrawer() {
-        if (mDrawerLayout != null)
-            mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+        if (drawer != null)
+            drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
     }
 
     /**
@@ -629,7 +494,7 @@ public class Starter extends SherlockFragmentActivity {
                     break;
                 case 1:
                     Log.i(TAG, "Broadcast 1 received");
-                    updateMDrawerLayout();
+                    drawer.update();
                     break;
                 case 2:
                     messageOverviewCommunicator.refreshListView();
@@ -719,7 +584,7 @@ public class Starter extends SherlockFragmentActivity {
             ChatDB db = new ChatDB(getApplicationContext());
             db.addOrDeleteFav(id);
             db.close();
-            updateMDrawerLayout();
+            drawer.update();
             Toast.makeText(getApplicationContext(), "Friend added or deleted", Toast.LENGTH_SHORT).show();
             return true;
         } else if (item.getGroupId() == 1) {

@@ -29,4 +29,5 @@ dependencies {
     compile 'com.facebook:facebook-android-sdk:+@aar'
     compile 'com.squareup.picasso:picasso:2.1.1@jar'
     compile project(':library:smackSources')
+    compile 'com.loopj.android:android-async-http:1.4.4@jar'
 }

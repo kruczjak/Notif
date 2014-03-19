@@ -23,7 +23,7 @@
             android:visibility="visible" />
 
     </FrameLayout>
-    /
+
 
     <TextView
         android:id="@+id/nameText"
