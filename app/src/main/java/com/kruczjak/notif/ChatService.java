@@ -265,14 +265,14 @@ public class ChatService extends Service {
         }
     }
 
-    private void downloadPhotoAndShowNotification(final Bundle _idAndName, final String body) {
+    private void downloadPhotoAndShowNotification(final Bundle data, final String body) {
         Picasso.with(getApplicationContext())
-                .load(_idAndName.getString("photo"))
+                .load(data.getString("photo"))
                 .into(new Target() {
                     @Override
                     public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom loadedFrom) {
                         Log.i(TAG, "Bitmap loaded " + loadedFrom.toString());
-                        showNotification(_idAndName, body, bitmap);
+                        showNotification(data, body, bitmap);
                     }
 
                     @Override
@@ -287,17 +287,17 @@ public class ChatService extends Service {
                 });
     }
 
-    private void showNotification(Bundle _idAndName, String body, Bitmap bitmap) {
+    private void showNotification(Bundle data, String body, Bitmap bitmap) {
         Log.i(TAG, "Notification start");
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this).setSmallIcon(R.drawable.icon)
-                .setContentTitle(_idAndName.getString("name")).setContentText(body).setContentInfo(Integer.toString(_idAndName.getInt("nr")));
+                .setContentTitle(data.getString("name")).setContentText(body).setContentInfo(Integer.toString(data.getInt("nr")));
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
         if (bitmap != null)
             mBuilder.setLargeIcon(bitmap);
 
-        if (_idAndName.getInt("nr") == 1 || _idAndName.getBoolean("start", false)) {
+        if (data.getInt("nr") == 1 || data.getBoolean("start", false)) {
             Uri alarmSound = Uri.parse(preferences.getString("notifications_ringtone", "content://settings/system/notification_sound"));
             mBuilder.setSound(alarmSound);
             // vibration
@@ -311,7 +311,7 @@ public class ChatService extends Service {
         mBuilder.setAutoCancel(true);
 
         Intent open = new Intent(this, Starter.class);
-        open.putExtra("go", _idAndName);
+        open.putExtra("go", data);
         PendingIntent pendingOpen = PendingIntent.getActivity(this, 0, open, 0);
         mBuilder.setContentIntent(pendingOpen);
 
@@ -319,14 +319,14 @@ public class ChatService extends Service {
 
         mBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText(body).setSummaryText("Messages"));
 
-        mNotificationManager.notify(_idAndName.getInt("id"), mBuilder.build());
+        mNotificationManager.notify(data.getInt("id"), mBuilder.build());
         // :D
 
         sendTypeBroadcast(2);
 
         if (preferences.getBoolean("onScreen", false)) {
             ScreenNotification screenNotification = ScreenNotification.getInstance(getApplicationContext());
-            screenNotification.startNotification(_idAndName.getString("photo"), _idAndName.getString("fbid"));
+            screenNotification.startNotification(data);
         }
     }
 
