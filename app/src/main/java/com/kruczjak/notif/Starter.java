@@ -223,7 +223,8 @@ public class Starter extends SherlockFragmentActivity {
         fragment.setArguments(bundle);
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
-        transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
+        transaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out,
+                R.anim.fade_in, R.anim.fade_out);
         transaction.add(R.id.layout_main, fragment);
         transaction.addToBackStack(null);
         transaction.commit();
