@@ -22,60 +22,54 @@ import android.widget.ListView;
 public class Drawer extends DrawerLayout {
     public static final String TAG = "Drawer";
     private ListView mDrawerList;
-    private Starter starterContext;
     private boolean closingAfterChoose;
-    private ContactsAdapter cca;
+    private ContactsAdapter contactsAdapter;
     private EditText editText;
+    private ChatDB chatDB;
 
-    public Drawer(Context context, Context ctx) {
+    public Drawer(Context context) {
         super(context);
     }
 
-    public Drawer(Context context, AttributeSet attrs, Context ctx) {
+    public Drawer(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public Drawer(Context context, AttributeSet attrs, int defStyle, Context ctx) {
+    public Drawer(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 
     private ActionBarDrawerToggle getMyDrawerListener() {
         final CharSequence mDrawerTitle = "Friends"; //TODO strings
-        final CharSequence mTitle = starterContext.getTitle();
+        final CharSequence mTitle = getStarted().getTitle();
 
-        return new ActionBarDrawerToggle(starterContext, this, R.drawable.icon, R.string.friends, R.string.friends) {
+        return new ActionBarDrawerToggle(getStarted(), this, R.drawable.icon, R.string.friends, R.string.friends) {
             /** Called when a drawer has settled in a completely closed state. */
             public void onDrawerClosed(View view) {
                 if (closingAfterChoose)
                     closingAfterChoose = false;
                 else
-                    starterContext.getSupportActionBar().setTitle(mTitle);
+                    getStarted().getSupportActionBar().setTitle(mTitle);
             }
 
             /** Called when a drawer has settled in a completely open state. */
             public void onDrawerOpened(View drawerView) {
-                starterContext.getSupportActionBar().setTitle(mDrawerTitle);
+                getStarted().getSupportActionBar().setTitle(mDrawerTitle);
             }
         };
-
-    }
-
-
-    public void setStarterContext(Starter starterContext) {
-        this.starterContext = starterContext;
     }
 
     public void init() {
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
         setDrawerListener(getMyDrawerListener());
 
+        chatDB = new ChatDB(getContext());
         new Handler().post(new Runnable() { // thread for loading data from db
             @Override
             public void run() {
-                ChatDB dbcha = new ChatDB(getContext());
-                cca = new ContactsAdapter(starterContext, dbcha.getFav(), dbcha.getOnlineContacts(starterContext.getOnline()), starterContext.getOnline());
-                mDrawerList.setAdapter(cca);
-                dbcha.close();
+                contactsAdapter = new ContactsAdapter(getStarted(), chatDB.getFav(), chatDB.getOnlineContacts(getStarted().getOnline()), getStarted().getOnline());
+                mDrawerList.setAdapter(contactsAdapter);
+                chatDB.close();
             }
         });
 
@@ -89,13 +83,12 @@ public class Drawer extends DrawerLayout {
             @Override
             public void onCreateContextMenu(ContextMenu contextMenu, View view, ContextMenu.ContextMenuInfo contextMenuInfo) {
                 AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) contextMenuInfo;
-                Bundle args = cca.getData(info.position);
+                Bundle args = contactsAdapter.getData(info.position);
                 contextMenu.setHeaderTitle(args.getString("name"));
                 String[] menuItems = getResources().getStringArray(R.array.menu);
 
-                ChatDB db = new ChatDB(getContext());
-                boolean is = db.isFav(String.valueOf(args.getInt("id")));
-                db.close();
+                boolean is = chatDB.isFav(String.valueOf(args.getInt("id")));
+                chatDB.close();
 
                 if (is)
                     contextMenu.add(Starter.FRAGMENT_GROUP, 0, 0, menuItems[0]);
@@ -112,15 +105,14 @@ public class Drawer extends DrawerLayout {
                 LinearLayout sc = (LinearLayout) findViewById(R.id.left_drawer_layout);
                 closingAfterChoose = true;
                 closeDrawer(sc);
-                Bundle args = cca.getData(i);
+                Bundle args = contactsAdapter.getData(i);
 
                 if (args.getBoolean("notable")) {
-                    ChatDB db = new ChatDB(getContext());
-                    db.createMessageTable(String.valueOf(args.getInt("id")));
-                    db.close();
+                    chatDB.createMessageTable(String.valueOf(args.getInt("id")));
+                    chatDB.close();
                 }
 
-                starterContext.addMessageThreadFragment(args);
+                getStarted().addMessageThreadFragment(args);
             }
         };
     }
@@ -135,25 +127,7 @@ public class Drawer extends DrawerLayout {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-                if (charSequence.toString().equals("")) {
-                    ChatDB dbcha = new ChatDB(getContext());
-                    cca = new ContactsAdapter(starterContext, dbcha.getFav(), dbcha.getOnlineContacts(starterContext.getOnline()), starterContext.getOnline());
-                    mDrawerList.setAdapter(cca);
-                    dbcha.close();
-                } else {
-                    String search = charSequence.toString();
-                    if (mDrawerList.getAdapter() == cca) {
-                        ChatDB chatDB = new ChatDB(getContext());
-                        ContactsSearchAdapter searchAdapter = new ContactsSearchAdapter(starterContext, chatDB.getSearched(search, starterContext.getOnline()), starterContext.getOnline());
-                        mDrawerList.setAdapter(searchAdapter);
-                        chatDB.close();
-                    } else {
-                        ChatDB chatDB = new ChatDB(getContext());
-                        ContactsSearchAdapter searchAdapter = (ContactsSearchAdapter) mDrawerList.getAdapter();
-                        searchAdapter.changeCursor(chatDB.getSearched(search, starterContext.getOnline()));
-
-                    }
-                }
+                searchInBox(charSequence);
             }
 
             @Override
@@ -163,21 +137,54 @@ public class Drawer extends DrawerLayout {
         });
     }
 
+    private void searchInBox(CharSequence charSequence) {
+        if (charSequence.toString().equals("")) {
+            mDrawerList.setAdapter(contactsAdapter);
+            normalUpdate();
+        } else {
+            String search = charSequence.toString();
+            if (mDrawerList.getAdapter() == contactsAdapter) {
+                ContactsSearchAdapter searchAdapter = new ContactsSearchAdapter(getStarted(), chatDB.getSearched(search, getStarted().getOnline()), getStarted().getOnline());
+                mDrawerList.setAdapter(searchAdapter);
+                chatDB.close();
+            } else {
+                searchUpdate(search);
+            }
+        }
+    }
+
     /**
      * Update left friends list ASYNC.
      */
     public void update() {
+        if (editText.getText().toString().equals("")) normalUpdate();
+        else searchUpdate(editText.getText().toString());
+    }
+
+    private void searchUpdate(String search) {
+        ContactsSearchAdapter searchAdapter = (ContactsSearchAdapter) mDrawerList.getAdapter();
+        searchAdapter.changeCursor(chatDB.getSearched(search, getStarted().getOnline()));
+    }
+
+    private void normalUpdate() {
         Log.i(TAG, "drawerUpdateAfterRoster");
         new Handler().post(new Runnable() { // thread for loading data from db
             @Override
             public void run() {
-                ChatDB dbcha = new ChatDB(getContext());
-                cca.setFavourites(dbcha.getFav());
-                cca.setOnline(starterContext.getOnline());
-                cca.setRest(dbcha.getOnlineContacts(starterContext.getOnline()));
-                cca.notifyDataSetChanged();
-                dbcha.close();
+                contactsAdapter.setFavourites(chatDB.getFav());
+                contactsAdapter.setOnline(getStarted().getOnline());
+                contactsAdapter.setRest(chatDB.getOnlineContacts(getStarted().getOnline()));
+                contactsAdapter.notifyDataSetChanged();
+                chatDB.close();
             }
         });
+    }
+
+    private Starter getStarted() {
+        return (Starter) getContext();
+    }
+
+    public ContactsAdapter getContactsAdapter() {
+        return contactsAdapter;
     }
 }
