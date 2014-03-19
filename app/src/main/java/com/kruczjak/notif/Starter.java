@@ -442,7 +442,7 @@ public class Starter extends SherlockFragmentActivity {
         db.deleteAndCreateDB();
         db.close();
 
-        ChatDB chatDB = new ChatDB(this);
+        ChatDB chatDB = ChatDB.getInstance(this);
         chatDB.deleteAndCreateDB();
         chatDB.close();
 
@@ -559,7 +559,7 @@ public class Starter extends SherlockFragmentActivity {
             chatService.startProcessQueue();
         else {
             Log.w(TAG, "Service ChatService is not running!");
-            ChatDB db = new ChatDB(this);
+            ChatDB db = ChatDB.getInstance(this);
             db.markError(id, text, time, 1, 0);
             messageThreadCommunicator.refreshListView();
         }
@@ -584,7 +584,7 @@ public class Starter extends SherlockFragmentActivity {
 
             String id = String.valueOf(drawer.getContactsAdapter().getData(info.position).getInt("id"));
 
-            ChatDB db = new ChatDB(getApplicationContext());
+            ChatDB db = ChatDB.getInstance(this);
             db.addOrDeleteFav(id);
             db.close();
             drawer.update();

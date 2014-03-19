@@ -91,7 +91,7 @@ public class FBFriends {
         }
         Log.i(TAG, String.valueOf(list.size()));
 
-        ChatDB chatDB = new ChatDB(ctx);
+        ChatDB chatDB = ChatDB.getInstance(ctx);
         chatDB.addFirstTimeContacts(list);
         chatDB.close();
 
@@ -126,7 +126,7 @@ public class FBFriends {
             @Override
             protected void onPostExecute(String photo) {
                 if (photo != null) {
-                    ChatDB chatDB = new ChatDB(avatar.getContext());
+                    ChatDB chatDB = ChatDB.getInstance(avatar.getContext());
                     chatDB.updatePhoto(fbID, photo);
                     chatDB.close();
 

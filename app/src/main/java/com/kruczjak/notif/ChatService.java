@@ -108,7 +108,7 @@ public class ChatService extends Service {
     }
 
     private void processOldNotifications() {
-        ChatDB db = new ChatDB(this);
+        ChatDB db = ChatDB.getInstance(getApplicationContext());
         Cursor c = db.getNotNotified();
 
         for (int i = 0; i < c.getCount(); i++) {
@@ -218,7 +218,7 @@ public class ChatService extends Service {
         if (message.getBody() != null) {    //TODO someone is writng...
             String user = message.getFrom().split("[@-]")[1];
 
-            ChatDB db = new ChatDB(this);
+            ChatDB db = ChatDB.getInstance(getApplicationContext());
             Date date = new Date();
             int time = (int) (date.getTime() / 1000);
             Bundle _idAndName = db.MessageAdder(user, message.getBody(), time);
@@ -512,7 +512,7 @@ public class ChatService extends Service {
      */
     public void startProcessQueue() {
         Log.i(TAG, "Starting checking queue");
-        ChatDB db = new ChatDB(this);
+        ChatDB db = ChatDB.getInstance(getApplicationContext());
         Cursor c = db.getMessagesQueue();
         if (c.moveToFirst()) {
             processMessagesAsync(c, db);

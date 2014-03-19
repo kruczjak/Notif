@@ -50,7 +50,7 @@ public class MessageOverviewFragment extends SherlockFragment implements OnRefre
         View view = inflater.inflate(R.layout.message_overview, container, false);
         lv = (MessageOverviewListView) view.findViewById(R.id.listView1);
 
-        Chdb = new ChatDB(getActivity());
+        Chdb = ChatDB.getInstance(getActivity());
         List<String> online = ((Starter) getActivity()).getOnline();
         mOA = new MessageOverviewAdapter(getActivity(), Chdb.getAllLastFriends(), false, online);
         lv.setAdapter(mOA);
@@ -91,7 +91,7 @@ public class MessageOverviewFragment extends SherlockFragment implements OnRefre
                 menu.setHeaderTitle(c.getString(2));
                 String[] menuItems = getResources().getStringArray(R.array.menu);
 
-                ChatDB db = new ChatDB(getActivity());
+                ChatDB db = ChatDB.getInstance(getActivity());
                 boolean is = db.isFav(c.getString(0));
                 db.close();
 
@@ -113,7 +113,8 @@ public class MessageOverviewFragment extends SherlockFragment implements OnRefre
     @Override
     public void refreshListView() {
         Log.i(TAG, "GOT IT!");
-        Chdb = new ChatDB(getActivity());
+        Chdb = ChatDB.getInstance(getActivity());
+        ;
         List<String> online = ((Starter) getActivity()).getOnline();
         mOA.changeCursor(Chdb.getAllLastFriends(), online);
         Chdb.close();
@@ -134,7 +135,8 @@ public class MessageOverviewFragment extends SherlockFragment implements OnRefre
         c.moveToPosition(info.position);
         String id = c.getString(0);
 
-        ChatDB db = new ChatDB(getActivity());
+        ChatDB db = ChatDB.getInstance(getActivity());
+        ;
         db.addOrDeleteFav(id);
         db.close();
         ((Starter) getActivity()).getDrawer().update();

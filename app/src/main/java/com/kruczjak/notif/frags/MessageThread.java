@@ -59,7 +59,7 @@ public class MessageThread extends SherlockFragment implements MessageThreadComm
         NotificationManager mNotificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.cancel(args.getInt("id"));
 
-        ChatDB db = new ChatDB(getActivity());
+        ChatDB db = ChatDB.getInstance(getActivity());
         mA = new MessagesAdapter(getActivity(), db.getMessages(Integer.toString(args.getInt("id"))), false);
         lv.setAdapter(mA);
         db.close();
@@ -103,7 +103,7 @@ public class MessageThread extends SherlockFragment implements MessageThreadComm
             long time = date.getTime() + 1000;
             int timeInt = (int) (date.getTime() / 1000 + 1);
             //first save to message view
-            ChatDB db = new ChatDB(getActivity());
+            ChatDB db = ChatDB.getInstance(getActivity());
             db.addMessageOnThread(messageTextString, Integer.toString(args.getInt("id")), 0, 1, timeInt);
             //now save to queue
             db.addMessageToQueue(args.getInt("id"), args.getString("fbid"), messageTextString, time);
@@ -139,7 +139,7 @@ public class MessageThread extends SherlockFragment implements MessageThreadComm
     }
 
     private void updateDatabase() {
-        ChatDB db = new ChatDB(getActivity());
+        ChatDB db = ChatDB.getInstance(getActivity());
         Cursor c = mA.getCursor();
         if (c != null) {
             if (c.moveToLast())
@@ -187,7 +187,7 @@ public class MessageThread extends SherlockFragment implements MessageThreadComm
     }
 
     public void refresh() {
-        ChatDB db = new ChatDB(getActivity());
+        ChatDB db = ChatDB.getInstance(getActivity());
         mA.changeCursor(db.getMessages(Integer.toString(args.getInt("id"))));
         db.close();
         scrollMyListViewToBottom();

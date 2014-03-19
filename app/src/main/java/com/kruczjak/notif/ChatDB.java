@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ChatDB extends SQLiteOpenHelper {
-
+    private static ChatDB chatDB;
     private static final String TAG = "ChatDB";
 
     private static final String DATABASE_NAME = "chat.db";
@@ -35,8 +35,15 @@ public class ChatDB extends SQLiteOpenHelper {
     // queue to send
     private static final String TABLE_SEND_IT_LATER = "sender";
 
-    public ChatDB(Context context) {
+    private ChatDB(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
+    public static ChatDB getInstance(Context context) {
+        if (chatDB == null) {
+            chatDB = new ChatDB(context.getApplicationContext());
+        }
+        return chatDB;
     }
 
     @Override

@@ -67,13 +67,12 @@ public class Drawer extends DrawerLayout {
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
         setDrawerListener(getMyDrawerListener());
 
-        chatDB = new ChatDB(getContext());
+        chatDB = ChatDB.getInstance(getContext());
         new Handler().post(new Runnable() { // thread for loading data from db
             @Override
             public void run() {
                 contactsAdapter = new ContactsAdapter(getStarted(), chatDB.getFav(), chatDB.getOnlineContacts(getStarted().getOnline()), getStarted().getOnline());
                 mDrawerList.setAdapter(contactsAdapter);
-                chatDB.close();
             }
         });
 
@@ -92,7 +91,6 @@ public class Drawer extends DrawerLayout {
                 String[] menuItems = getResources().getStringArray(R.array.menu);
 
                 boolean is = chatDB.isFav(String.valueOf(args.getInt("id")));
-                chatDB.close();
 
                 if (is)
                     contextMenu.add(Starter.FRAGMENT_GROUP, 0, 0, menuItems[0]);
@@ -113,7 +111,6 @@ public class Drawer extends DrawerLayout {
 
                 if (args.getBoolean("notable")) {
                     chatDB.createMessageTable(String.valueOf(args.getInt("id")));
-                    chatDB.close();
                 }
 
                 getStarted().addMessageThreadFragment(args);
@@ -150,7 +147,6 @@ public class Drawer extends DrawerLayout {
             if (mDrawerList.getAdapter() == contactsAdapter) {
                 ContactsSearchAdapter searchAdapter = new ContactsSearchAdapter(getStarted(), chatDB.getSearched(search, getStarted().getOnline()), getStarted().getOnline());
                 mDrawerList.setAdapter(searchAdapter);
-                chatDB.close();
             } else {
                 searchUpdate(search);
             }
@@ -179,7 +175,6 @@ public class Drawer extends DrawerLayout {
                 contactsAdapter.setOnline(getStarted().getOnline());
                 contactsAdapter.setRest(chatDB.getOnlineContacts(getStarted().getOnline()));
                 contactsAdapter.notifyDataSetChanged();
-                chatDB.close();
             }
         });
     }

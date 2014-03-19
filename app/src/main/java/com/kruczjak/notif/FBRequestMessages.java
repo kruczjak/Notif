@@ -169,7 +169,7 @@ public class FBRequestMessages {
     private void firstTimeMessageThread(JSONArray dataIN, String fbid, int unrCount, int lastTime, String name) throws JSONException {
         if (dataIN != null) {
             JSONObject data;
-            ChatDB db = new ChatDB(ctx);
+            ChatDB db = ChatDB.getInstance(ctx);
             for (int k = 0; k < dataIN.length(); k++) {
                 data = dataIN.getJSONObject(k);
                 if (!data.isNull("message")) {
@@ -213,7 +213,7 @@ public class FBRequestMessages {
      * Started when ChatService starts.
      */
     public void startAppRun() {
-        ChatDB db = new ChatDB(ctx);
+        ChatDB db = ChatDB.getInstance(ctx);
         int lastTime = db.getLastUpdated();
         db.close();
 
