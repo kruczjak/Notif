@@ -4,8 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -16,7 +14,7 @@ public class ConnectivityChange extends BroadcastReceiver {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         if (preferences.getBoolean("log", false)) return;
 
-        if (isInternetAccess(context)) {
+        if (FunctionsMain.isInternetAccess(context)) {
             Log.i("NET", "connected");
             sendBroadcast(context, 3);
             if (!NotService.service_state && preferences.getBoolean("service", true)) {
@@ -36,19 +34,6 @@ public class ConnectivityChange extends BroadcastReceiver {
             shutdownAllServices(context);
             sendBroadcast(context, 4);
         }
-    }
-
-    /**
-     * Checks for internet
-     *
-     * @param context
-     * @return
-     */
-    private boolean isInternetAccess(Context context) {
-        ConnectivityManager connectivityManager = (ConnectivityManager)
-                context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetInfo = connectivityManager.getActiveNetworkInfo();
-        return (activeNetInfo != null && activeNetInfo.isConnectedOrConnecting());
     }
 
     /**
