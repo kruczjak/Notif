@@ -20,6 +20,7 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.facebook.Session;
+import com.kruczjak.notif.screen.ScreenNotification;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -322,6 +323,11 @@ public class ChatService extends Service {
         // :D
 
         sendTypeBroadcast(2);
+
+        if (preferences.getBoolean("onScreen", false)) {
+            ScreenNotification screenNotification = ScreenNotification.getInstance(getApplicationContext());
+            screenNotification.startNotification(_idAndName.getString("photo"), _idAndName.getString("fbid"));
+        }
     }
 
     private class ConnectionEstablishing extends AsyncTask<Void, Void, Void> {

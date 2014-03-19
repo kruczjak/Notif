@@ -9,6 +9,10 @@
             android:key="serviceChat"
             android:defaultValue="true" />
         <CheckBoxPreference
+            android:title="OnScreen Notifications"
+            android:key="onScreen"
+            android:defaultValue="false" />
+        <CheckBoxPreference
             android:summary="@string/avatar_settings_summary"
             android:title="@string/avatar_settings"
             android:key="avatar_state"
