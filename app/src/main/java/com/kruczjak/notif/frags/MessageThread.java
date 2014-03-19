@@ -153,37 +153,6 @@ public class MessageThread extends SherlockFragment implements MessageThreadComm
         final ActionBar aB = getSherlockActivity().getSupportActionBar();
         aB.setTitle(args.getString("name"));
 
-//        String avatarPath = getActivity().getFilesDir() + "/" + args.getString("fbid");
-//        File file = new File(getActivity().getFilesDir(), args.getString("fbid"));
-//        if (file.exists()) {
-//            Bitmap bmp = BitmapFactory.decodeFile(avatarPath);
-//            Resources res = getResources();
-//            BitmapDrawable icon = new BitmapDrawable(res, bmp);
-//            aB.setIcon(icon);
-//        } else
-//            aB.setIcon(R.drawable.avatar);
-//        Picasso.with(getActivity())
-//                .load("http://graph.facebook.com/" + args.getString("fbid") + "/picture?width=100&height=100")
-//                .into(new Target() {
-//                    @Override
-//                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom loadedFrom) {
-//                        Log.i(TAG,"Bitmap loaded " + loadedFrom.toString());
-//                        Resources res = getResources();
-//                        BitmapDrawable icon = new BitmapDrawable(res, bitmap);
-//                        aB.setIcon(icon);
-//                    }
-//
-//                    @Override
-//                    public void onBitmapFailed(Drawable drawable) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onPrepareLoad(Drawable drawable) {
-//
-//                    }
-//                });
-
         if (aB.getNavigationMode() == ActionBar.NAVIGATION_MODE_TABS)
             aB.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         aB.setHomeButtonEnabled(true);
