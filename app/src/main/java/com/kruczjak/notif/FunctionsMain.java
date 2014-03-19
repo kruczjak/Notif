@@ -4,6 +4,7 @@
 package com.kruczjak.notif;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -93,6 +94,18 @@ public class FunctionsMain {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetInfo = connectivityManager.getActiveNetworkInfo();
         return (activeNetInfo != null && activeNetInfo.isConnectedOrConnecting());
+    }
+
+    /**
+     * Send broadcast to Starter.java
+     *
+     * @param context
+     * @param number
+     */
+    public static void sendBroadcast(Context context, int number) {
+        Intent brad = new Intent("com.kruczjak.notif");
+        brad.putExtra("t", number);
+        context.sendBroadcast(brad);
     }
 
 }

@@ -16,7 +16,7 @@ public class ConnectivityChange extends BroadcastReceiver {
 
         if (FunctionsMain.isInternetAccess(context)) {
             Log.i("NET", "connected");
-            sendBroadcast(context, 3);
+            FunctionsMain.sendBroadcast(context, 3);
             if (!NotService.service_state && preferences.getBoolean("service", true)) {
                 Intent service = new Intent(context, NotService.class);
                 context.startService(service);
@@ -32,7 +32,7 @@ public class ConnectivityChange extends BroadcastReceiver {
         } else {
             Log.i("NET", "Not connected");
             shutdownAllServices(context);
-            sendBroadcast(context, 4);
+            FunctionsMain.sendBroadcast(context, 4);
         }
     }
 
@@ -46,17 +46,5 @@ public class ConnectivityChange extends BroadcastReceiver {
         context.stopService(service);
         service = new Intent(context, ChatService.class);
         context.stopService(service);
-    }
-
-    /**
-     * Send broadcast to Starter.java
-     *
-     * @param context
-     * @param number
-     */
-    private void sendBroadcast(Context context, int number) {
-        Intent brad = new Intent("com.kruczjak.notif");
-        brad.putExtra("t", number);
-        context.sendBroadcast(brad);
     }
 }
