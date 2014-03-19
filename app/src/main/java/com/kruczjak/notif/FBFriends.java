@@ -1,6 +1,7 @@
 package com.kruczjak.notif;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -51,14 +52,13 @@ public class FBFriends {
         Request request = new Request(session, graphPath, null, HttpMethod.GET, new Request.Callback() {
             @Override
             public void onCompleted(Response response) {
-                List<String[]> list = null;
                 try {
                     processFriends(response);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
                 Log.i(TAG, "redictering to FBRequestMessages");
-                if (ctx.isInternetAccess())
+                if (FunctionsMain.isInternetAccess(ctx))
                     new FBRequestMessages(ctx).firstTimeRun(dialog);
                 else {
                     Log.e(TAG, "LOGIN:failure, no net");
@@ -96,63 +96,6 @@ public class FBFriends {
 
     }
 
-//    private String getRedictURL(String fbID) {
-//        final String url = "http://graph.facebook.com/" + fbID + "/picture?width=100&height=100";
-//        String photo = null;
-//        try {
-//            HttpURLConnection con = (HttpURLConnection)(new URL(url).openConnection());
-//            con.setInstanceFollowRedirects( false );
-//            con.connect();
-//            Log.i(TAG, Integer.toString(con.getResponseCode()));
-//            Log.i(TAG, con.getHeaderField("Location"));
-//            photo = con.getHeaderField("Location");
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        return photo;
-//    }
-
-//    private void getRedictURL(final Starter ctx, final ProgressDialog dialog, final List<String[]> list) {
-//        new AsyncTask<Void, Void, List<String[]>>() {
-//            @Override
-//            protected List<String[]> doInBackground(Void... voids) {
-//                List<String[]> readyList = new ArrayList<String[]>();
-//                for (String[] data : list) {
-//                    String url = "http://graph.facebook.com/" + data[1] + "/picture?width=100&height=100";
-//                    String photo = null;
-////                    try {
-////                        HttpURLConnection con = (HttpURLConnection) (new URL(url).openConnection());
-////                        con.setInstanceFollowRedirects(false);
-////                        con.connect();
-////                        Log.i(TAG, Integer.toString(con.getResponseCode()));
-////                        Log.i(TAG, con.getHeaderField("Location"));
-////                        photo = con.getHeaderField("Location");
-////                    } catch (IOException e) {
-////                        e.printStackTrace();
-////                    }
-//                    readyList.add(new String[]{data[0], data[1], photo});
-//                }
-//                return readyList;
-//            }
-//
-//            @Override
-//            protected void onPostExecute(List<String[]> list) {
-//                ChatDB chatDB = new ChatDB(ctx);
-//                chatDB.addFirstTimeContacts(list);
-//                chatDB.close();
-//
-//                Log.i(TAG, "redictering to FBRequestMessages");
-//                if (ctx.isInternetAccess())
-//                    new FBRequestMessages(ctx).firstTimeRun(dialog);
-//                else {
-//                    Log.e(TAG, "LOGIN:failure, no net");
-//                    ctx.logOut();
-//                    dialog.cancel();
-//                }
-//            }
-//        }.execute();
-//    }
-
     /**
      * Get new link and then fire load updated photo
      *
@@ -162,6 +105,7 @@ public class FBFriends {
      */
     public void getNewPhotoLinkAndUpdatePhoto(final Avatar avatar, final String fbID, final int from) {
         final String url = "http://graph.facebook.com/" + fbID + "/picture?width=100&height=100";
+
         AsyncTask<Void, Void, String> asyncTask = new AsyncTask<Void, Void, String>() {
             @Override
             protected String doInBackground(Void... voids) {
@@ -186,16 +130,10 @@ public class FBFriends {
                     chatDB.close();
 
                     avatar.setTested(true);
-
-                    Intent intent = new Intent("com.kruczjak.notif");
-                    if (from == 0) {
-                        intent.putExtra("t", 2);
-                        avatar.getContext().sendBroadcast(intent);
-                    } else if (from == 1) {
-                        intent.putExtra("t", 1);
-                        avatar.getContext().sendBroadcast(intent);
-                    }
                     avatar.setTesting(false);
+                    Waiter waiter = Waiter.getInstance(from, avatar.getContext());
+                    if (waiter.getStatus() != Status.RUNNING)
+                        waiter.execute();
                 }
             }
         };
@@ -204,6 +142,47 @@ public class FBFriends {
             asyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         } else {
             asyncTask.execute();
+        }
+    }
+
+    private static class Waiter extends AsyncTask<Void, Void, Void> {
+        private int from;
+        private Context ctx;
+        private static Waiter waiter;
+
+        private Waiter(int from, Context ctx) {
+            this.from = from;
+            this.ctx = ctx;
+        }
+
+        private static Waiter getInstance(int from, Context context) {
+            if (waiter == null || waiter.getStatus() == Status.FINISHED)
+                waiter = new Waiter(from, context);
+
+            return waiter;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            Intent intent = new Intent("com.kruczjak.notif");
+            if (from == 0) {
+                intent.putExtra("t", 2);
+                ctx.sendBroadcast(intent);
+            } else if (from == 1) {
+                intent.putExtra("t", 1);
+                ctx.sendBroadcast(intent);
+            }
         }
     }
 }

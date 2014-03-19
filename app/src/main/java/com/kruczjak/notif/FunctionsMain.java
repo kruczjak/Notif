@@ -84,4 +84,15 @@ public class FunctionsMain {
             return ctx.getString(id);
     }
 
+    /**
+     * Checks if Internet is available.
+     *
+     * @return true if connected, false if disconnected
+     */
+    public static boolean isInternetAccess(Context context) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetInfo = connectivityManager.getActiveNetworkInfo();
+        return (activeNetInfo != null && activeNetInfo.isConnectedOrConnecting());
+    }
+
 }

@@ -77,7 +77,7 @@ public class NotifFragment extends SherlockFragment implements OnRefreshListener
         };
 
         initListView();
-        firstInitRequest();
+//        firstInitRequest();
         return view;
     }
 
@@ -143,7 +143,7 @@ public class NotifFragment extends SherlockFragment implements OnRefreshListener
     }
 
     private boolean isInternetAccess() {
-        return ((Starter) getActivity()).isInternetAccess();
+        return FunctionsMain.isInternetAccess(getActivity());
     }
 
     /**
@@ -209,7 +209,8 @@ public class NotifFragment extends SherlockFragment implements OnRefreshListener
                         }
 
                     }
-                });
+                }
+        );
         Request.executeBatchAsync(request);
     }
 

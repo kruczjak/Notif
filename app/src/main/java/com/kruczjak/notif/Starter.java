@@ -69,7 +69,6 @@ public class Starter extends SherlockFragmentActivity {
     protected static final String TAG = "Starter";
     private boolean isServiceBind = false;
     private Menu menu;
-    private ContactsAdapter cca;
     private SplashFragment splash;
     private Drawer drawer;
 
@@ -206,7 +205,6 @@ public class Starter extends SherlockFragmentActivity {
      */
     private void initDrawerLayout() {
         drawer = (Drawer) findViewById(R.id.drawer_layout);
-        drawer.setStarterContext(this);
         drawer.init();
     }
 
@@ -579,13 +577,13 @@ public class Starter extends SherlockFragmentActivity {
         if (item.getGroupId() == FRAGMENT_GROUP) {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
 
-            String id = String.valueOf(cca.getData(info.position).getInt("id"));
+            String id = String.valueOf(drawer.getContactsAdapter().getData(info.position).getInt("id"));
 
             ChatDB db = new ChatDB(getApplicationContext());
             db.addOrDeleteFav(id);
             db.close();
             drawer.update();
-            Toast.makeText(getApplicationContext(), "Friend added or deleted", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Friend added or deleted", Toast.LENGTH_SHORT).show();
             return true;
         } else if (item.getGroupId() == 1) {
             return messageOverviewCommunicator.onMyContextItemSelected(item);
@@ -603,5 +601,9 @@ public class Starter extends SherlockFragmentActivity {
             }
 
         }
+    }
+
+    public Drawer getDrawer() {
+        return drawer;
     }
 }

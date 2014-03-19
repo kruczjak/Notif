@@ -64,7 +64,7 @@ public class FBRequestMessages {
                     }
                 }
                 Log.i(TAG, "redictering to FBFriends");
-                if (ctxS.isInternetAccess())
+                if (FunctionsMain.isInternetAccess(ctx))
                     ctxS.loggedInActions2(dialog);
                 else {
                     Log.e(TAG, "LOGIN:failure, no net");

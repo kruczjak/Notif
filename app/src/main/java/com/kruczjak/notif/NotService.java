@@ -60,9 +60,11 @@ public class NotService extends Service {
         service_state = true;
 
 //	    thanks to this - no FC
-        session = new Session.Builder(this).setApplicationId(MY_APP_ID).build(); //create session with this id
-        session.openForRead(null);
-        Log.i("expiration_date", session.getExpirationDate().toString());
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        if (preferences.getBoolean("log", false)) {
+            session = new Session.Builder(this).setApplicationId(MY_APP_ID).build(); //create session with this id
+            session.openForRead(null);
+        }
     }
 
     @Override
