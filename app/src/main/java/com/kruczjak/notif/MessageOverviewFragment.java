@@ -132,7 +132,7 @@ public class MessageOverviewFragment extends SherlockFragment implements OnRefre
         ChatDB db = new ChatDB(getActivity());
         db.addOrDeleteFav(id);
         db.close();
-        ((Starter) getActivity()).updateMDrawerLayout();
+        ((Starter) getActivity()).getDrawer().update();
         Toast.makeText(getActivity(), "Friend added or deleted", Toast.LENGTH_SHORT).show();
         return true;
     }

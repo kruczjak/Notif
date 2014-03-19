@@ -3,8 +3,6 @@ package com.kruczjak.notif;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.ImageView;
@@ -19,7 +17,6 @@ public class Avatar extends ImageView implements Target {
     protected static final String TAG = "Avatar";
     boolean tested = false;
     boolean testing = false;
-    private String fbID;
     private int from;
 
     public Avatar(Context context) {
@@ -51,22 +48,12 @@ public class Avatar extends ImageView implements Target {
     public void onBitmapFailed(Drawable drawable) {
         //todo refresh link!!!
         Log.e(TAG, "failed");
-        if (!tested && isInternetAccess() && !testing) {
+        Log.wtf(TAG, "Why here?!");
+        if (!tested && FunctionsMain.isInternetAccess(getContext()) && !testing) {
             Log.i(TAG, "trying");
             testing = true;
-            new FBFriends().getNewPhotoLinkAndUpdatePhoto(this, fbID, from);
+            new FBFriends().getNewPhotoLinkAndUpdatePhoto(this, (String) getTag(), from);
         }
-    }
-
-    /**
-     * Check if internet is running
-     *
-     * @return isInternet
-     */
-    private boolean isInternetAccess() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetInfo = connectivityManager.getActiveNetworkInfo();
-        return (activeNetInfo != null && activeNetInfo.isConnectedOrConnecting());
     }
 
     @Override
@@ -82,7 +69,7 @@ public class Avatar extends ImageView implements Target {
      * @param from      0 from overview, 1 from contacts
      */
     public void showAvatar(String photoLink, String fbID, int from) {
-        this.fbID = fbID;
+//        if (!fbID.equals(getTag()))  return;
         this.from = from;
         if (testing) return;
         if (photoLink == null) {
