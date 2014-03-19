@@ -1,4 +1,4 @@
-<com.kruczjak.notif.Drawer xmlns:android="http://schemas.android.com/apk/res/android"
+<com.kruczjak.notif.views.Drawer xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/drawer_layout"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
@@ -13,7 +13,7 @@
         android:orientation="vertical">
 
 
-        <com.kruczjak.notif.StarterViewPager xmlns:android="http://schemas.android.com/apk/res/android"
+        <com.kruczjak.notif.views.StarterViewPager xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/viewpager"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
@@ -45,4 +45,4 @@
             android:dividerHeight="0dp" />
     </LinearLayout>
 
-</com.kruczjak.notif.Drawer>
+</com.kruczjak.notif.views.Drawer>

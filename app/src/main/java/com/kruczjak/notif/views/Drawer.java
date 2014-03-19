@@ -1,4 +1,4 @@
-package com.kruczjak.notif;
+package com.kruczjak.notif.views;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -15,6 +15,10 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+
+import com.kruczjak.notif.ChatDB;
+import com.kruczjak.notif.R;
+import com.kruczjak.notif.Starter;
 
 /**
  * Created by kruczjak on 19.03.14.

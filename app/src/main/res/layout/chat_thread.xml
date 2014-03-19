@@ -32,7 +32,7 @@
         <requestFocus />
     </EditText>
 
-    <com.kruczjak.notif.MessageListView
+    <com.kruczjak.notif.views.MessageListView
         android:id="@+id/listView1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -43,7 +43,7 @@
         android:stackFromBottom="true"
         android:layout_above="@+id/textView">
 
-    </com.kruczjak.notif.MessageListView>
+    </com.kruczjak.notif.views.MessageListView>
 
     <TextView
         android:layout_width="match_parent"

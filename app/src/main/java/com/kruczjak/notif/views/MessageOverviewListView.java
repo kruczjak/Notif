@@ -1,4 +1,4 @@
-package com.kruczjak.notif;
+package com.kruczjak.notif.views;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
+
+import com.kruczjak.notif.R;
 
 /**
  * Created by kruczjak on 12.01.14.

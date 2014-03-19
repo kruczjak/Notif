@@ -28,6 +28,11 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.facebook.Session;
 import com.facebook.SessionState;
+import com.kruczjak.notif.frags.MessageThread;
+import com.kruczjak.notif.frags.SplashFragment;
+import com.kruczjak.notif.views.Drawer;
+import com.kruczjak.notif.views.FragmentTabPagerControl;
+import com.kruczjak.notif.views.StarterViewPager;
 import com.squareup.picasso.LruCache;
 
 import java.util.List;

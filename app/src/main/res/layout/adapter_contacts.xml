@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/fra">
 
-        <com.kruczjak.notif.Avatar
+        <com.kruczjak.notif.views.Avatar
             android:id="@+id/avatar"
             android:layout_width="75px"
             android:layout_height="75px"

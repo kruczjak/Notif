@@ -1,4 +1,4 @@
-package com.kruczjak.notif;
+package com.kruczjak.notif.views;
 
 import android.content.Context;
 import android.support.v4.view.ViewPager;

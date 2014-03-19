@@ -11,6 +11,7 @@ import com.facebook.HttpMethod;
 import com.facebook.Request;
 import com.facebook.Response;
 import com.facebook.Session;
+import com.kruczjak.notif.views.Avatar;
 
 import org.json.JSONArray;
 import org.json.JSONException;

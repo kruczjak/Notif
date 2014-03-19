@@ -1,4 +1,4 @@
-package com.kruczjak.notif;
+package com.kruczjak.notif.views;
 
 import android.app.Activity;
 import android.database.Cursor;
@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.kruczjak.notif.R;
 
 import java.util.List;
 
