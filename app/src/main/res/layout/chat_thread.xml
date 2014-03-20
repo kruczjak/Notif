@@ -27,9 +27,11 @@
         android:gravity="center_vertical|bottom"
         android:hint="Write your message"
         android:inputType="textCapSentences|textMultiLine"
-        android:textAppearance="?android:attr/textAppearanceSmallInverse">
+        android:textAppearance="?android:attr/textAppearanceSmallInverse"
+        android:focusable="true"
+        android:focusableInTouchMode="true">
 
-        <requestFocus />
+    <requestFocus />
     </EditText>
 
     <com.kruczjak.notif.views.MessageListView
