@@ -28,7 +28,7 @@ public class ScreenNotification {
     private String photoLink;
     private TextView number;
     private ImageView online;
-    private MyView fullMessage;
+    private FullScreenView fullMessage;
 
     private ScreenNotification(Context context) {
         this.ctx = context;
@@ -126,7 +126,7 @@ public class ScreenNotification {
                 PixelFormat.TRANSLUCENT);
 
         LayoutInflater inflater = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        fullMessage = (MyView) inflater.inflate(R.layout.chat_thread_full_notification, null);
+        fullMessage = (FullScreenView) inflater.inflate(R.layout.chat_thread_full_notification, null);
 
         windowManager.addView(fullMessage, fullParams);
     }

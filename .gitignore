@@ -20,6 +20,7 @@ local.properties
 .project
 
 # Android Studio
+app/build
 .idea/
 .gradle
 gradle*
@@ -32,3 +33,5 @@ gradle*
 *.ipr
 *~
 *.swp
+library/smackSources/ic_launcher-web.png
+library/smackSources/proguard-project.txt

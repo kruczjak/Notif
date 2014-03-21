@@ -8,18 +8,18 @@ import android.widget.RelativeLayout;
 /**
  * Created by kruczjak on 20.03.14.
  */
-public class MyView extends RelativeLayout {
+public class FullScreenView extends RelativeLayout {
 
 
-    public MyView(Context context) {
+    public FullScreenView(Context context) {
         super(context);
     }
 
-    public MyView(Context context, AttributeSet attrs) {
+    public FullScreenView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public MyView(Context context, AttributeSet attrs, int defStyle) {
+    public FullScreenView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 
