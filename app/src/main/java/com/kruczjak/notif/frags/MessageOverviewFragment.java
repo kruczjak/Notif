@@ -135,10 +135,10 @@ public class MessageOverviewFragment extends SherlockFragment implements OnRefre
 
         if (menuItemIndex == 1) {
             Bundle data = new Bundle();
-            data.putBoolean("presence", false);
             data.putString("fbid", c.getString(1));
             data.putString("photo", c.getString(7));
             ((Starter) getActivity()).startNotification(data);
+            return true;
         }
 
         ChatDB db = ChatDB.getInstance(getActivity());

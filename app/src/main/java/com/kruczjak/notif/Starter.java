@@ -374,7 +374,9 @@ public class Starter extends SherlockFragmentActivity {
      * Show Splash screen and do some damage! xD (cancel handler runnable)
      */
     public void showSplash() {
-        chatService.onDestroy();
+        if (chatService != null)
+            chatService.onDestroy();
+
         doUnbindService();
         Intent service = new Intent(this, ChatService.class);
         stopService(service);

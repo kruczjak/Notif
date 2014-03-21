@@ -18,6 +18,7 @@ import com.kruczjak.notif.views.Avatar;
  * Created by kruczjak on 19.03.14.
  */
 public class ScreenNotification {
+    private static final String TAG = "ScreenNotification";
     private Context ctx;
     private WindowManager windowManager;
     private Avatar avatar;
@@ -27,6 +28,7 @@ public class ScreenNotification {
     private String photoLink;
     private TextView number;
     private ImageView online;
+    private MyView fullMessage;
 
     private ScreenNotification(Context context) {
         this.ctx = context;
@@ -45,7 +47,6 @@ public class ScreenNotification {
             setAndShowAvatar(data);
         } else {
             update(data);
-
         }
     }
 
@@ -79,6 +80,7 @@ public class ScreenNotification {
             online = null;
             number = null;
         }
+
     }
 
     private void setAndShowAvatar(Bundle data) {
@@ -124,8 +126,12 @@ public class ScreenNotification {
                 PixelFormat.TRANSLUCENT);
 
         LayoutInflater inflater = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        view = inflater.inflate(R.layout.chat_thread, null);
+        fullMessage = (MyView) inflater.inflate(R.layout.chat_thread_full_notification, null);
 
-        windowManager.addView(view, fullParams);
+        windowManager.addView(fullMessage, fullParams);
+    }
+
+    public void onBackKey() {
+        windowManager.removeView(fullMessage);
     }
 }
