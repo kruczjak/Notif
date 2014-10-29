@@ -1,6 +1,6 @@
 # README #
 
-DISCOUNTINUED
+DISCONTINUED
 
 ### Who do I talk to? ###
 
